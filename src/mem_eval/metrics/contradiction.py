@@ -11,14 +11,16 @@ from __future__ import annotations
 from mem_eval.metrics.records import EvalRecord
 
 
-def _passes(r: EvalRecord) -> bool:
+def query_passes(r: EvalRecord) -> bool:
+    """A single contradiction query passes iff the current fact is in R_k, no
+    superseded version is in R_k, and (if an answer was synthesized) it reflects
+    the current value."""
     rf = r.retrieved_facts
     current_present = r.gold_support <= rf
     stale_present = bool(r.gold_superseded & rf)
     item_pass = current_present and not stale_present
     if not item_pass:
         return False
-    # If an answer was synthesized, it must reflect the current value.
     if r.answer is not None and r.answer.strip():
         return r.answer_correct
     return True
@@ -28,7 +30,7 @@ def resolution_accuracy(records: list[EvalRecord]) -> float:
     probes = [r for r in records if r.gold_superseded]
     if not probes:
         return 0.0
-    return sum(1 for r in probes if _passes(r)) / len(probes)
+    return sum(1 for r in probes if query_passes(r)) / len(probes)
 
 
-__all__ = ["resolution_accuracy"]
+__all__ = ["resolution_accuracy", "query_passes"]

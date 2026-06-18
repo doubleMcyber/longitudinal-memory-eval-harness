@@ -102,6 +102,7 @@ class Suite:
     dataset_version: str
     seed: int
     scenarios: list[Scenario]
+    config_name: str = "standard"  # scale preset name (PRD §4 scale)
 
     def scenarios_for(self, category: str) -> list[Scenario]:
         return [s for s in self.scenarios if s.category == category]

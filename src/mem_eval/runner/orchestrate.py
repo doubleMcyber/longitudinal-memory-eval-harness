@@ -123,7 +123,12 @@ def run_eval(
     backend_meta = {"name": backend.name, "version": backend.version}
     nd = bool(backend.stats().extra.get("nondeterministic", False))
     backend_meta["nondeterministic"] = nd
-    dataset_meta = {"suite": suite.suite, "version": suite.dataset_version, "seed": suite.seed}
+    dataset_meta = {
+        "suite": suite.suite,
+        "version": suite.dataset_version,
+        "seed": suite.seed,
+        "scale": suite.config_name,
+    }
     config = {"k": k, "consolidate_cadence": consolidate_cadence}
     env = {
         "git_sha": _git_sha(),

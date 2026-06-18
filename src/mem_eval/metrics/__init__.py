@@ -7,12 +7,13 @@ Quality metrics (1-4) participate in the determinism hash; operational metrics
 from __future__ import annotations
 
 from mem_eval.data.schema import CATEGORIES
-from mem_eval.metrics.contradiction import resolution_accuracy
+from mem_eval.metrics.contradiction import query_passes, resolution_accuracy
 from mem_eval.metrics.cost import cost_per_query
 from mem_eval.metrics.latency import latency_percentiles
 from mem_eval.metrics.precision import precision_at_k
 from mem_eval.metrics.recall import recall_at_k
 from mem_eval.metrics.records import EvalRecord
+from mem_eval.metrics.significance import bootstrap_ci
 from mem_eval.metrics.staleness import staleness
 from mem_eval.metrics.storage import storage_growth
 
@@ -31,6 +32,34 @@ def _answer_accuracy(records: list[EvalRecord]) -> float:
     return sum(1 for r in records if r.answer_correct) / len(records)
 
 
+def _quality_vectors(records: list[EvalRecord]) -> dict[str, list[float]]:
+    """Per-query value vectors for the four quality metrics, for bootstrap CIs."""
+    recall_v = [
+        len(r.retrieved_facts & r.gold_support) / len(r.gold_support)
+        for r in records
+        if r.gold_support
+    ]
+    precision_v = [
+        (len(r.retrieved_facts & r.gold_support) / r.retrieved_count) if r.retrieved_count else 0.0
+        for r in records
+    ]
+    probes = [r for r in records if r.gold_superseded]
+    contradiction_v = [1.0 if query_passes(r) else 0.0 for r in probes]
+    staleness_v = [
+        (r.superseded_returned / r.retrieved_count) if r.retrieved_count else 0.0 for r in probes
+    ]
+    return {
+        "recall_at_k": recall_v,
+        "precision_at_k": precision_v,
+        "contradiction_resolution_accuracy": contradiction_v,
+        "staleness": staleness_v,
+    }
+
+
+def _intervals(records: list[EvalRecord]) -> dict:
+    return {k: bootstrap_ci(v) for k, v in _quality_vectors(records).items()}
+
+
 def _block(records: list[EvalRecord], ingest_usd: float, storage: dict) -> dict:
     cost = cost_per_query(records, ingest_usd)
     return {
@@ -47,6 +76,9 @@ def _block(records: list[EvalRecord], ingest_usd: float, storage: dict) -> dict:
         "cost": cost,
         "answer_accuracy": _answer_accuracy(records),
         "num_queries": len(records),
+        # statistical rigor: bootstrap 95% CIs on the quality metrics (reported,
+        # excluded from the determinism hash).
+        "ci95": _intervals(records),
     }
 
 
