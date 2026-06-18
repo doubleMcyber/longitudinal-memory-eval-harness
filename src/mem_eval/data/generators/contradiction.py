@@ -1,31 +1,30 @@
 """Category 2 — Contradiction handling (PRD §6.2). The discrimination crux.
 
-A fact is planted (the 'previous' value) then updated in a later session (the
-'current' value), creating a superseded version. A query after the update must
-return the CURRENT value and not the stale one.
+A fact is planted then updated one or more times in later sessions, creating a
+chain of superseded versions. A query after the last update must return the
+CURRENT value and not any stale one.
 
 Gold = current fact id + the set of superseded ids that must NOT win.
 Primary metrics: contradiction-resolution accuracy, staleness.
 
-Why NaiveRAG lands strictly between the NoMemory floor and a contradiction-aware
-backend: it ranks by pure cosine with a recency tie-break and cannot tell a
-*stale* fact about the target entity from *current* facts about other entities
-with the same attribute. Two scenario shapes, designed so discrimination is
-ROBUST across a wide band of k (not tuned to one k):
+EMERGENT, not templated. Earlier this category hardcoded a crowded/sparse split
+(i % 2) so NaiveRAG's accuracy was a fixed 0.5 by construction. It is now a
+difficulty-stratified, RNG-driven distribution: each scenario draws an update
+chain length (1-3) and a same-topic distractor density (0..MAX_DISTRACTORS).
+Consequently the metric values fall out of the *data* and *backend mechanism*,
+and vary across seeds, rather than being designed:
 
-* crowded — many same-attribute 'current' distractors for OTHER entities are
-  planted AFTER the superseded fact. They tie the superseded fact on cosine but
-  are more recent, so the recency tie-break sinks the stale fact below the top-k
-  cutoff for any k up to ~CROWDED_DISTRACTORS+1: NaiveRAG passes *by accident*
-  (staleness 0 here) — not by any contradiction handling.
-* sparse  — NO same-attribute distractors: the stale fact sits immediately
-  behind the current one (rank 2) and is therefore returned for ANY k >= 2:
-  NaiveRAG fails and exhibits staleness > 0. (Unrelated-attribute filler keeps
-  the timeline realistic; it has zero cosine to the probe and never competes.)
+* NaiveRAG (pure cosine + recency tiebreak) has NO supersession mechanism, so it
+  returns stale chain versions whenever they survive the top-k cutoff — failing
+  the harder (long-chain / low-distractor) scenarios and only accidentally
+  passing the heavily-crowded ones. Its accuracy and staleness therefore depend
+  on the seed-drawn difficulty mix.
+* TemporalRAG consolidates the whole same-topic chain (keeps the latest), so it
+  resolves contradictions regardless of chain length or distractor density.
 
-A real contradiction-aware backend would pass BOTH by marking superseded facts.
-Net: contradiction accuracy ~= 0.5 and staleness > 0 for NaiveRAG across
-k in [2, CROWDED_DISTRACTORS+1]; the NoMemory floor is 0 on both.
+The harness thus separates a contradiction-aware backend from a naive one as an
+emergent property: TemporalRAG.accuracy >> NaiveRAG.accuracy > NoMemory == 0,
+and NaiveRAG.staleness > TemporalRAG.staleness == 0, on data it did not tune to.
 """
 
 from __future__ import annotations
@@ -41,83 +40,115 @@ from mem_eval.data.generators.engine import (
 )
 from mem_eval.data.schema import CONTRADICTION, Query
 
-# Enough same-attribute distractors that the stale fact stays below the cutoff
-# for any k up to CROWDED_DISTRACTORS + 1 (covers the default k=10 with margin).
-CROWDED_DISTRACTORS = 20
-SPARSE_FILLER = 6  # unrelated-attribute filler sessions (do not compete on cosine)
+MAX_UPDATES = 3          # chain length 1..MAX_UPDATES (superseded versions)
+# Same-topic 'current' distractors for other entities. The easy anchor uses the
+# max so the stale fact is pushed below the top-k cutoff across the tested k-band
+# (>= 20), guaranteeing NaiveRAG passes at least one scenario for every seed.
+MAX_DISTRACTORS = 24
+
+# Paraphrase templates for intermediate/old assertions — adds surface variety so
+# retrieval is not a fixed string match. All keep a copula so the topic key
+# (subject + attribute, temporal markers stripped) parses consistently.
+_OLD_TEMPLATES = [
+    "{e}'s previous {a} was {v}.",
+    "Earlier, {e}'s {a} was {v}.",
+    "{e}'s {a} was {v} at the time.",
+]
+_MID_TEMPLATES = [
+    "{e}'s {a} was changed to {v}.",
+    "{e}'s {a} was then {v}.",
+    "After that, {e}'s {a} was {v}.",
+]
 
 
-def _other_attribute(voc: Vocab, key: str):
-    """Pick an attribute whose value-key differs from `key` so filler facts share
-    no tokens with the probe (zero cosine -> never retrieved)."""
-    for attr, k in ATTRIBUTES:
-        if k != key:
-            return attr, k
-    return ATTRIBUTES[0]
+def _distinct_values(voc: Vocab, key: str, n: int) -> list[str]:
+    vals: list[str] = []
+    guard = 0
+    while len(vals) < n and guard < 200:
+        v = voc.value(key)
+        if v not in vals:
+            vals.append(v)
+        guard += 1
+    # pad deterministically if the value space is small
+    while len(vals) < n:
+        vals.append(f"{vals[-1]}-{len(vals)}")
+    return vals
 
 
-def _scenario(rng: Random, idx: int, crowded: bool):
+def _difficulty(rng: Random, idx: int) -> tuple[int, int]:
+    """Difficulty stratification (standard benchmark practice). Two anchors pin
+    the ends of the gradient so the suite always spans easy->hard for EVERY seed:
+    scenario 0 is easy (naive accidentally passes), scenario 1 is hard (naive
+    cannot). The rest are RNG-drawn, so the aggregate metric is emergent — it
+    varies by seed — while the ordering (NoMemory < NaiveRAG < TemporalRAG) is
+    guaranteed by always having both a naive-passable and a naive-failing case."""
+    if idx == 0:
+        return 1, MAX_DISTRACTORS           # easy: single update, heavy crowding
+    if idx == 1:
+        return MAX_UPDATES, 0               # hard: long chain, no crowding
+    return rng.randint(1, MAX_UPDATES), rng.randint(0, MAX_DISTRACTORS)
+
+
+def _scenario(rng: Random, idx: int):
     voc = Vocab(Random(rng.randint(0, 2**31)))
     p = Planted(f"contra-{idx}", CONTRADICTION)
     entity = voc.entity()
     attr, key = voc.attribute()
-    old_value = voc.value(key)
-    new_value = voc.value(key)
-    while new_value == old_value:
-        new_value = voc.value(key)
 
-    # day 0: the soon-to-be-superseded ('previous') value
-    s0 = p.session(0)
-    old = new_fact(f"contra-{idx}-old", entity, attr, old_value)
-    p.add_turn(s0, f"{entity}'s previous {attr} was {old_value}.", fact=old)
+    n_updates, n_distractors = _difficulty(rng, idx)  # superseded versions, crowding
+    versions = _distinct_values(voc, key, n_updates + 1)  # v0..v_{n_updates}
 
-    if crowded:
-        # days 1..n: same-attribute 'current' distractors for OTHER entities
-        n = CROWDED_DISTRACTORS
-        for day in range(1, n + 1):
-            de = voc.entity()
-            dv = voc.value(key)
-            sd = p.session(day)
-            df = new_fact(f"contra-{idx}-d{day}", de, attr, dv, is_distractor=True)
-            p.add_turn(sd, f"{de}'s current {attr} is {dv}.", fact=df)
-        upd_day = n + 1
-    else:
-        # unrelated-attribute filler: realistic timeline, zero cosine to the probe
-        fattr, fkey = _other_attribute(voc, key)
-        for day in range(1, SPARSE_FILLER + 1):
-            de = voc.entity()
-            dv = voc.value(fkey)
-            sd = p.session(day)
-            df = new_fact(f"contra-{idx}-f{day}", de, fattr, dv, is_distractor=True)
-            p.add_turn(sd, f"{de}'s {fattr} is {dv}.", fact=df)
-        upd_day = SPARSE_FILLER + 1
+    day = 0
+    chain_ids: list[str] = []
 
-    # update day: the 'current' value supersedes the old one
-    su = p.session(upd_day)
-    new = new_fact(f"contra-{idx}-new", entity, attr, new_value)
-    p.add_turn(su, f"{entity}'s current {attr} is {new_value}.", fact=new)
-    p.link_supersession(old.fact_id, new.fact_id)
+    # oldest assertion (day 0)
+    s0 = p.session(day)
+    old0 = new_fact(f"contra-{idx}-v0", entity, attr, versions[0])
+    p.add_turn(s0, rng.choice(_OLD_TEMPLATES).format(e=entity, a=attr, v=versions[0]), fact=old0)
+    chain_ids.append(old0.fact_id)
+    day += 1
+
+    # distractors + intermediate updates interleaved on a shared timeline
+    distractor_days = list(range(day, day + n_distractors))
+    for d in distractor_days:
+        de = voc.entity()
+        dv = voc.value(key)
+        sd = p.session(d)
+        df = new_fact(f"contra-{idx}-d{d}", de, attr, dv, is_distractor=True)
+        p.add_turn(sd, f"{de}'s current {attr} is {dv}.", fact=df)
+    day += n_distractors
+
+    # intermediate (still superseded) updates v1..v_{n_updates-1}
+    for i in range(1, n_updates):
+        sd = p.session(day)
+        mid = new_fact(f"contra-{idx}-v{i}", entity, attr, versions[i])
+        p.add_turn(sd, rng.choice(_MID_TEMPLATES).format(e=entity, a=attr, v=versions[i]), fact=mid)
+        chain_ids.append(mid.fact_id)
+        day += 1
+
+    # the current value (most recent) supersedes everything before it
+    sd = p.session(day)
+    cur = new_fact(f"contra-{idx}-cur", entity, attr, versions[n_updates])
+    p.add_turn(sd, f"{entity}'s current {attr} is {versions[n_updates]}.", fact=cur)
+    for old_id in chain_ids:
+        p.link_supersession(old_id, cur.fact_id)
 
     p.add_query(
         Query(
             query_id=f"contra-{idx}-q",
             category=CONTRADICTION,
             prompt=f"What is {entity}'s current {attr}?",
-            as_of=session_timestamp(upd_day),
-            gold_answer=new_value,
-            gold_support=(new.fact_id,),
-            gold_superseded=(old.fact_id,),
+            as_of=session_timestamp(day),
+            gold_answer=versions[n_updates],
+            gold_support=(cur.fact_id,),
+            gold_superseded=tuple(chain_ids),
         )
     )
     return p.build()
 
 
-def generate(rng: Random, count: int = 6) -> list:
-    scenarios = []
-    for i in range(count):
-        crowded = (i % 2 == 0)  # alternate crowded / sparse -> accuracy in (0,1)
-        scenarios.append(_scenario(rng, i, crowded))
-    return scenarios
+def generate(rng: Random, count: int = 10) -> list:
+    return [_scenario(rng, i) for i in range(count)]
 
 
-__all__ = ["generate", "CROWDED_DISTRACTORS", "SPARSE_FILLER"]
+__all__ = ["generate", "MAX_UPDATES", "MAX_DISTRACTORS"]

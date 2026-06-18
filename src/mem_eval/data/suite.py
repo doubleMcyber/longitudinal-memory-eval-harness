@@ -25,7 +25,7 @@ from mem_eval.data.schema import (
     Suite,
 )
 
-DATASET_VERSION = "2026.6"
+DATASET_VERSION = "2026.7"
 
 # Ordered (category, generator) — order is part of the dataset identity.
 GENERATORS = [

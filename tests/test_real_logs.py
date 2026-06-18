@@ -9,7 +9,7 @@ import json
 
 import pytest
 
-from mem_eval.adapters import BASELINES, REGISTRY, STUBS, get_backend
+from mem_eval.adapters import BASELINES, REFERENCES, REGISTRY, STUBS, get_backend
 from mem_eval.adapters.base import MemoryBackend
 from mem_eval.data.importers.transcript import (
     build_scenario_from_logs,
@@ -66,7 +66,7 @@ def test_label_proposal_is_flagged_low_confidence():
 
 def test_stub_registry_complete():
     assert set(STUBS) == {"letta", "curated_brain"}
-    assert REGISTRY == {**BASELINES, **STUBS}
+    assert REGISTRY == {**BASELINES, **REFERENCES, **STUBS}
 
 
 @pytest.mark.parametrize("name", list(STUBS))

@@ -156,15 +156,16 @@ def test_a4_discrimination(suite):
 
 
 def test_a4_kband_invariant_holds():
-    """The crux's robustness rests on a load-bearing relationship between the
-    crowded-distractor count and the gate's k: if a future edit lowers
-    CROWDED_DISTRACTORS below k-1, the stale fact re-enters top-k in crowded
-    scenarios and A4 silently breaks. Pin it so that regression fails loudly."""
-    from mem_eval.data.generators.contradiction import CROWDED_DISTRACTORS
+    """The easy difficulty anchor relies on enough same-topic distractors to push
+    the stale fact below the top-k cutoff across the tested band (k<=20), so
+    NaiveRAG passes at least one contradiction scenario for every seed. If a
+    future edit lowers MAX_DISTRACTORS below that, ca(NaiveRAG) can collapse to
+    the NoMemory floor and A4 silently breaks. Pin the invariant."""
+    from mem_eval.data.generators.contradiction import MAX_DISTRACTORS
 
-    assert CROWDED_DISTRACTORS + 1 >= 20, (
-        "CROWDED_DISTRACTORS must keep the stale fact below the cutoff for the "
-        "k-band the robustness test exercises (up to k=20)"
+    assert MAX_DISTRACTORS >= 20, (
+        "MAX_DISTRACTORS must keep the easy anchor's stale fact below the cutoff "
+        "for the k-band the robustness test exercises (up to k=20)"
     )
 
 
@@ -180,6 +181,47 @@ def test_a4_discrimination_is_robust_across_k_and_seed(seed, k):
     assert naive["by_category"][CONTRADICTION]["staleness"] > 0.0
     assert nomem["overall"]["contradiction_resolution_accuracy"] == 0.0
     assert naive["overall"]["contradiction_resolution_accuracy"] > 0.0
+
+
+@pytest.mark.parametrize("seed", [42, 7, 123, 2024])
+def test_meaningful_spectrum_reference_beats_naive(seed):
+    """A legit benchmark must REWARD good behavior, not only punish nothing: the
+    contradiction-aware reference (TemporalRAG) strictly beats NaiveRAG on the
+    contradiction axis, and the full floor->naive->good ordering holds. This is
+    the property that lets a real memory system see a credible target to clear."""
+    s = build_suite("v1", seed=seed)
+    nomem = run_eval(get_backend("no_memory"), s, k=10)["metrics"]
+    naive = run_eval(get_backend("naive_rag"), s, k=10)["metrics"]
+    temporal = run_eval(get_backend("temporal_rag"), s, k=10)["metrics"]
+
+    # contradiction: floor < naive < good reference
+    ca_nm = nomem["overall"]["contradiction_resolution_accuracy"]
+    ca_nr = naive["overall"]["contradiction_resolution_accuracy"]
+    ca_tr = temporal["overall"]["contradiction_resolution_accuracy"]
+    assert ca_nm < ca_nr < ca_tr, (ca_nm, ca_nr, ca_tr)
+
+    # staleness: the good reference curates away stale items the naive one returns
+    assert (
+        temporal["by_category"][CONTRADICTION]["staleness"]
+        < naive["by_category"][CONTRADICTION]["staleness"]
+    )
+
+    # retrieval quality: reference is at least as good and strictly beats the floor
+    assert nomem["overall"]["recall_at_k"] < naive["overall"]["recall_at_k"]
+    assert naive["overall"]["recall_at_k"] <= temporal["overall"]["recall_at_k"]
+
+
+def test_discrimination_is_emergent_not_constant():
+    """Discrimination must be a property of data+mechanism, not a designed
+    constant: NaiveRAG's contradiction accuracy varies across seeds (it used to
+    be hardcoded to exactly 0.5 by an i%2 split)."""
+    vals = {
+        run_eval(get_backend("naive_rag"), build_suite("v1", seed=s), k=10)["metrics"][
+            "overall"
+        ]["contradiction_resolution_accuracy"]
+        for s in range(40, 52)
+    }
+    assert len(vals) >= 3, f"contradiction accuracy looks templated, not emergent: {vals}"
 
 
 # --- A5 — Determinism -------------------------------------------------------
