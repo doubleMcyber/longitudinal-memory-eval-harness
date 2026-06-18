@@ -1,0 +1,226 @@
+{
+  "corpus_version": "real-logs-v1",
+  "note": "Hand-authored, real-STYLE multi-session conversation logs (a curated stand-in for human-collected production logs; see README). Gold is hand-labeled in the structured layer ONLY (support/superseded turn refs + answers), never inferred from text. Each scenario exercises a memory capability the synthetic suite also measures, so the two can be rank-correlated (external validity, D3). No backend ever sees this file.",
+  "scenarios": [
+    {
+      "scenario_id": "rl-addr",
+      "category": "contradiction",
+      "sessions": [
+        {"session_id": "addr-s0", "timestamp": "2025-02-03T09:12:00", "turns": [
+          {"turn_id": "addr-s0-t0", "role": "user", "text": "Quick note while I remember: Priya's mailing address is 14 Rua das Flores, Lisbon."},
+          {"turn_id": "addr-s0-t1", "role": "assistant", "text": "Got it, I've saved that."}
+        ]},
+        {"session_id": "addr-s1", "timestamp": "2025-02-20T14:40:00", "turns": [
+          {"turn_id": "addr-s1-t0", "role": "user", "text": "Unrelated, but the team offsite got moved to the second week of May."},
+          {"turn_id": "addr-s1-t1", "role": "assistant", "text": "Noted the offsite change."}
+        ]},
+        {"session_id": "addr-s2", "timestamp": "2025-04-11T11:05:00", "turns": [
+          {"turn_id": "addr-s2-t0", "role": "user", "text": "Update: Priya's mailing address is now 88 Calle Mayor, Madrid."},
+          {"turn_id": "addr-s2-t1", "role": "assistant", "text": "Updated, thanks."}
+        ]}
+      ],
+      "queries": [
+        {"query_id": "rl-addr-q0", "category": "contradiction",
+         "prompt": "What is Priya's current mailing address?",
+         "as_of": "2025-05-01T00:00:00",
+         "gold_answer": "Madrid", "answer_aliases": ["88 Calle Mayor"],
+         "support": [{"session": "addr-s2", "turn": "addr-s2-t0"}],
+         "superseded": [{"session": "addr-s0", "turn": "addr-s0-t0"}]}
+      ]
+    },
+    {
+      "scenario_id": "rl-plan",
+      "category": "contradiction",
+      "sessions": [
+        {"session_id": "plan-s0", "timestamp": "2025-01-10T10:00:00", "turns": [
+          {"turn_id": "plan-s0-t0", "role": "user", "text": "For the record, the company's subscription tier is Pro."},
+          {"turn_id": "plan-s0-t1", "role": "assistant", "text": "Noted."}
+        ]},
+        {"session_id": "plan-s1", "timestamp": "2025-03-02T16:30:00", "turns": [
+          {"turn_id": "plan-s1-t0", "role": "user", "text": "We upgraded today, so the company's subscription tier is now Enterprise."},
+          {"turn_id": "plan-s1-t1", "role": "assistant", "text": "Congrats, updated."}
+        ]},
+        {"session_id": "plan-s2", "timestamp": "2025-03-15T09:00:00", "turns": [
+          {"turn_id": "plan-s2-t0", "role": "user", "text": "Side note: the billing contact is still Sam."},
+          {"turn_id": "plan-s2-t1", "role": "assistant", "text": "Okay, kept Sam as billing contact."}
+        ]}
+      ],
+      "queries": [
+        {"query_id": "rl-plan-q0", "category": "contradiction",
+         "prompt": "What is the company's current subscription tier?",
+         "as_of": "2025-04-01T00:00:00",
+         "gold_answer": "Enterprise",
+         "support": [{"session": "plan-s1", "turn": "plan-s1-t0"}],
+         "superseded": [{"session": "plan-s0", "turn": "plan-s0-t0"}]}
+      ]
+    },
+    {
+      "scenario_id": "rl-reside",
+      "category": "longitudinal_recall",
+      "sessions": [
+        {"session_id": "reside-s0", "timestamp": "2025-02-01T08:30:00", "turns": [
+          {"turn_id": "reside-s0-t0", "role": "user", "text": "By the way, Marcus relocated to Reykjavik over the summer."},
+          {"turn_id": "reside-s0-t1", "role": "assistant", "text": "Nice, noted that."}
+        ]},
+        {"session_id": "reside-s1", "timestamp": "2025-02-15T13:00:00", "turns": [
+          {"turn_id": "reside-s1-t0", "role": "user", "text": "Marcus is renewing his city tour-guide license this month."},
+          {"turn_id": "reside-s1-t1", "role": "assistant", "text": "Got it."}
+        ]},
+        {"session_id": "reside-s2", "timestamp": "2025-03-01T17:45:00", "turns": [
+          {"turn_id": "reside-s2-t0", "role": "user", "text": "Reminder: Marcus prefers morning meetings."},
+          {"turn_id": "reside-s2-t1", "role": "assistant", "text": "Noted his preference."}
+        ]}
+      ],
+      "queries": [
+        {"query_id": "rl-reside-q0", "category": "longitudinal_recall",
+         "prompt": "Which city is Marcus residing in?",
+         "as_of": "2025-04-01T00:00:00",
+         "gold_answer": "Reykjavik",
+         "support": [{"session": "reside-s0", "turn": "reside-s0-t0"}]}
+      ]
+    },
+    {
+      "scenario_id": "rl-employer",
+      "category": "longitudinal_recall",
+      "sessions": [
+        {"session_id": "emp-s0", "timestamp": "2025-01-05T09:00:00", "turns": [
+          {"turn_id": "emp-s0-t0", "role": "user", "text": "FYI Dana was hired by Orchard Systems back in the fall."},
+          {"turn_id": "emp-s0-t1", "role": "assistant", "text": "Great, noted."}
+        ]},
+        {"session_id": "emp-s1", "timestamp": "2025-01-20T12:15:00", "turns": [
+          {"turn_id": "emp-s1-t0", "role": "user", "text": "Dana asked who is handling the Friday demo these days."},
+          {"turn_id": "emp-s1-t1", "role": "assistant", "text": "I'll check on that."}
+        ]},
+        {"session_id": "emp-s2", "timestamp": "2025-02-10T15:30:00", "turns": [
+          {"turn_id": "emp-s2-t0", "role": "user", "text": "Dana's commute got a lot shorter after the move."},
+          {"turn_id": "emp-s2-t1", "role": "assistant", "text": "Nice to hear."}
+        ]}
+      ],
+      "queries": [
+        {"query_id": "rl-employer-q0", "category": "longitudinal_recall",
+         "prompt": "Who is Dana's employer these days?",
+         "as_of": "2025-03-01T00:00:00",
+         "gold_answer": "Orchard Systems", "answer_aliases": ["Orchard"],
+         "support": [{"session": "emp-s0", "turn": "emp-s0-t0"}]}
+      ]
+    },
+    {
+      "scenario_id": "rl-email",
+      "category": "longitudinal_recall",
+      "sessions": [
+        {"session_id": "email-s0", "timestamp": "2025-01-02T07:50:00", "turns": [
+          {"turn_id": "email-s0-t0", "role": "user", "text": "Setting up recovery: my backup email is vault.keeper@protonmail.com."},
+          {"turn_id": "email-s0-t1", "role": "assistant", "text": "Saved your recovery details."}
+        ]},
+        {"session_id": "email-s1", "timestamp": "2025-01-22T11:00:00", "turns": [
+          {"turn_id": "email-s1-t0", "role": "user", "text": "Can you draft a thank-you note for the catering team?"},
+          {"turn_id": "email-s1-t1", "role": "assistant", "text": "Sure, here is a draft."}
+        ]},
+        {"session_id": "email-s2", "timestamp": "2025-02-14T18:20:00", "turns": [
+          {"turn_id": "email-s2-t0", "role": "user", "text": "Let's reschedule the dentist to next Tuesday."},
+          {"turn_id": "email-s2-t1", "role": "assistant", "text": "Rescheduled to Tuesday."}
+        ]}
+      ],
+      "queries": [
+        {"query_id": "rl-email-q0", "category": "longitudinal_recall",
+         "prompt": "What backup email did I set for account recovery?",
+         "as_of": "2025-03-01T00:00:00",
+         "gold_answer": "vault.keeper@protonmail.com",
+         "support": [{"session": "email-s0", "turn": "email-s0-t0"}]}
+      ]
+    },
+    {
+      "scenario_id": "rl-needle",
+      "category": "needle",
+      "sessions": [
+        {"session_id": "needle-s0", "timestamp": "2025-01-01T08:00:00", "turns": [
+          {"turn_id": "needle-s0-t0", "role": "user", "text": "Important for the building: the server-room door code is 4417."},
+          {"turn_id": "needle-s0-t1", "role": "assistant", "text": "Noted the door code."}
+        ]},
+        {"session_id": "needle-s1", "timestamp": "2025-01-08T09:00:00", "turns": [
+          {"turn_id": "needle-s1-t0", "role": "user", "text": "Let's plan the Q1 newsletter themes."},
+          {"turn_id": "needle-s1-t1", "role": "assistant", "text": "Here are a few newsletter themes."}
+        ]},
+        {"session_id": "needle-s2", "timestamp": "2025-01-15T10:00:00", "turns": [
+          {"turn_id": "needle-s2-t0", "role": "user", "text": "Remind me to order more coffee pods."},
+          {"turn_id": "needle-s2-t1", "role": "assistant", "text": "Reminder set for coffee pods."}
+        ]},
+        {"session_id": "needle-s3", "timestamp": "2025-01-23T11:00:00", "turns": [
+          {"turn_id": "needle-s3-t0", "role": "user", "text": "What's a good icebreaker for the all-hands?"},
+          {"turn_id": "needle-s3-t1", "role": "assistant", "text": "Try a two-truths-and-a-lie round."}
+        ]},
+        {"session_id": "needle-s4", "timestamp": "2025-02-02T12:00:00", "turns": [
+          {"turn_id": "needle-s4-t0", "role": "user", "text": "Draft a tweet about our hiring push."},
+          {"turn_id": "needle-s4-t1", "role": "assistant", "text": "Here's a draft tweet."}
+        ]},
+        {"session_id": "needle-s5", "timestamp": "2025-02-18T13:00:00", "turns": [
+          {"turn_id": "needle-s5-t0", "role": "user", "text": "Summarize the feedback from the design review."},
+          {"turn_id": "needle-s5-t1", "role": "assistant", "text": "Here's a summary of the design feedback."}
+        ]},
+        {"session_id": "needle-s6", "timestamp": "2025-03-05T14:00:00", "turns": [
+          {"turn_id": "needle-s6-t0", "role": "user", "text": "Help me outline the offsite agenda."},
+          {"turn_id": "needle-s6-t1", "role": "assistant", "text": "Here's an offsite agenda outline."}
+        ]}
+      ],
+      "queries": [
+        {"query_id": "rl-needle-q0", "category": "needle",
+         "prompt": "What is the server-room door code?",
+         "as_of": "2025-04-01T00:00:00",
+         "gold_answer": "4417",
+         "support": [{"session": "needle-s0", "turn": "needle-s0-t0"}]}
+      ]
+    },
+    {
+      "scenario_id": "rl-multihop",
+      "category": "multi_hop",
+      "sessions": [
+        {"session_id": "mh-s0", "timestamp": "2025-01-03T09:30:00", "turns": [
+          {"turn_id": "mh-s0-t0", "role": "user", "text": "Lea just started a new job at Northwind Trading."},
+          {"turn_id": "mh-s0-t1", "role": "assistant", "text": "Congrats to Lea."}
+        ]},
+        {"session_id": "mh-s1", "timestamp": "2025-01-18T10:30:00", "turns": [
+          {"turn_id": "mh-s1-t0", "role": "user", "text": "Northwind Trading's headquarters is in Tallinn."},
+          {"turn_id": "mh-s1-t1", "role": "assistant", "text": "Good to know."}
+        ]},
+        {"session_id": "mh-s2", "timestamp": "2025-02-01T11:30:00", "turns": [
+          {"turn_id": "mh-s2-t0", "role": "user", "text": "Reminder: book the team lunch for next week."},
+          {"turn_id": "mh-s2-t1", "role": "assistant", "text": "Will do."}
+        ]}
+      ],
+      "queries": [
+        {"query_id": "rl-multihop-q0", "category": "multi_hop",
+         "prompt": "In which city is the headquarters of the company Lea works for?",
+         "as_of": "2025-03-01T00:00:00",
+         "gold_answer": "Tallinn",
+         "support": [{"session": "mh-s0", "turn": "mh-s0-t0"}, {"session": "mh-s1", "turn": "mh-s1-t0"}]}
+      ]
+    },
+    {
+      "scenario_id": "rl-recency",
+      "category": "recency_relevance",
+      "sessions": [
+        {"session_id": "rec-s0", "timestamp": "2025-01-05T08:00:00", "turns": [
+          {"turn_id": "rec-s0-t0", "role": "user", "text": "Setting a goal: my target weight is 180 lbs."},
+          {"turn_id": "rec-s0-t1", "role": "assistant", "text": "Noted your goal."}
+        ]},
+        {"session_id": "rec-s1", "timestamp": "2025-02-20T08:00:00", "turns": [
+          {"turn_id": "rec-s1-t0", "role": "user", "text": "Revised plan: my target weight is now 170 lbs."},
+          {"turn_id": "rec-s1-t1", "role": "assistant", "text": "Updated your goal."}
+        ]}
+      ],
+      "queries": [
+        {"query_id": "rl-recency-q0", "category": "recency_relevance", "intent": "recency",
+         "prompt": "What is my current target weight?",
+         "as_of": "2025-03-10T00:00:00",
+         "gold_answer": "170",
+         "support": [{"session": "rec-s1", "turn": "rec-s1-t0"}],
+         "superseded": [{"session": "rec-s0", "turn": "rec-s0-t0"}]},
+        {"query_id": "rl-recency-q1", "category": "recency_relevance", "intent": "relevance",
+         "prompt": "What did I originally set as my target weight?",
+         "as_of": "2025-03-10T00:00:00",
+         "gold_answer": "180",
+         "support": [{"session": "rec-s0", "turn": "rec-s0-t0"}]}
+      ]
+    }
+  ]
+}
