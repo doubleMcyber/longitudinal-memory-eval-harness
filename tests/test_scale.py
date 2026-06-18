@@ -53,11 +53,12 @@ def test_scale_recorded_in_scorecard_and_hash():
 
 
 def test_explicit_config_overrides_scale():
-    cfg = SuiteConfig(name="tiny", longitudinal_count=1, contradiction_count=2,
-                      multi_hop_count=1, recency_count=1, needle_count=1, needle_depth=5)
+    cfg = SuiteConfig(name="tiny", longitudinal_count=1, lexical_gap_count=1,
+                      contradiction_count=2, multi_hop_count=1, recency_count=1,
+                      needle_count=1, needle_depth=5)
     s = build_suite("v1", seed=1, config=cfg)
     assert s.config_name == "tiny"
-    assert len(s.scenarios) == 1 + 2 + 1 + 1 + 1
+    assert len(s.scenarios) == 1 + 1 + 2 + 1 + 1 + 1  # long + lexgap + contra + hop + rec + needle
 
 
 def test_presets_exist():

@@ -23,7 +23,7 @@ from mem_eval.adapters.base import (
     Session,
     Usage,
 )
-from mem_eval.adapters.embeddings import EmbeddingFn, TokenCosineEmbedding
+from mem_eval.adapters.embeddings import EmbeddingFn, SynonymHashEmbedding, TokenCosineEmbedding
 from mem_eval.adapters.no_memory import DONT_KNOW
 from mem_eval.pricing import price
 from mem_eval.text import byte_size, count_tokens
@@ -103,4 +103,16 @@ class ConfigurableRAG(BaseBackend):
         )
 
 
-__all__ = ["ConfigurableRAG"]
+class SemanticRAG(ConfigurableRAG):
+    """ConfigurableRAG preset using the offline semantic (synonym-aware) embedding.
+    Concretely demonstrates that a semantic retriever beats lexical token-cosine on
+    the lexical-gap scenarios — the same win a real embedding model would deliver
+    through the EmbeddingFn seam."""
+
+    name = "semantic_rag"
+
+    def __init__(self) -> None:
+        super().__init__(SynonymHashEmbedding())
+
+
+__all__ = ["ConfigurableRAG", "SemanticRAG"]
