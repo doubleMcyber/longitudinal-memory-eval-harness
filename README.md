@@ -22,13 +22,17 @@ Every score is relative to in-box reference points, and the scoreboard is a
 | backend | recall@k | contradiction_acc | staleness | what it is |
 |---|---|---|---|---|
 | `no_memory` | 0.00 | 0.00 | 0.00 | the floor (stores nothing) |
-| `naive_rag` | ~0.91 | ~0.2 (varies) | >0 | standard cosine RAG, no curation |
-| `temporal_rag` | 1.00 | 1.00 | 0.00 | contradiction-aware reference |
+| `naive_rag` | ~0.91 | ~0.2 (varies) | high | standard cosine RAG, no curation |
+| `temporal_rag` | 1.00 | ~0.6–0.8 (varies, **< 1.0**) | low | contradiction-aware reference |
 
-The separation is **emergent**: the contradiction suite is difficulty-stratified
-and RNG-driven, so `naive_rag`'s accuracy varies by seed rather than being a
-hardcoded constant, while `temporal_rag` resolves supersession via honest,
-text-only consolidation (no gold access).
+The separation is **emergent and not tuned to the reference**. The contradiction
+suite is difficulty-stratified and RNG-driven across two axes — crowding/chain
+length and *phrasing* (possessive vs coreference). `naive_rag`'s accuracy varies
+by seed (no supersession mechanism); `temporal_rag` resolves supersession via
+honest, text-only consolidation (no gold access) but **cannot** resolve
+adversarial coreference phrasing, so its score is strictly below 1.0 with visible
+**headroom** for a real system to claim. Anchored scenarios guarantee
+`no_memory < naive_rag < temporal_rag < 1.0` for every seed.
 
 ## Install & run
 

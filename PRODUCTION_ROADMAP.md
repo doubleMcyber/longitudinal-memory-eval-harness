@@ -31,6 +31,25 @@ roadmap tracks that elevation. Each wave keeps `pytest -q` green and commits onc
 Each wave: implement → independent verification subagent (up to spec?) → commit.
 After all waves: planning subagent (what next) → main-agent self-check against this rubric.
 
+## Cycle 1 self-check (after waves 1–4)
+Met: meaningful spectrum, emergent contradiction, pluggable backends, contradiction-aware
+reference, scale/depth, robust grading, bootstrap CIs, real-log IAA, ops polish. **Not yet**
+production-ready — a planning pass surfaced credibility-gating gaps:
+- **D1** retrieval is lexical token-cosine on near-verbatim data (grep wins; semantic seam unproven).
+- **D2** TemporalRAG scores a flat 1.0 because contradiction data is co-designed with its `topic_key`
+  heuristic — looks tuned to make its own reference win.
+- **D3** real-log suite is one tiny sample; no external-validity study.
+- **D4** no curation-stress / poisoning scenarios; `consolidate()` never bites.
+- **D5** modeled cost/latency rendered beside quality without a "modeled" caveat.
+
+## Cycle 2 (highest leverage first)
+- **Wave 5 (D2 + D5)**: adversarial contradiction phrasing (coreference) that defeats `topic_key`, so
+  TemporalRAG's contradiction score is emergent and < 1.0 with headroom, while NaiveRAG < TemporalRAG
+  stays guaranteed. Label modeled cost/latency.
+- **Wave 6 (D1)**: lexical-gap (paraphrase) slice + offline semantic embedding demonstrator so a
+  semantic embedding provably beats lexical — making the EmbeddingFn seam meaningful.
+- **Later**: curation-stress (D4), labeled real-log suite + validity study (D3).
+
 ## Carry-forward notes (from verification subagents)
 - **W1**: TemporalRAG scores a flat 1.0/0.0 on contradiction — the data never stresses its
   consolidation heuristic. A later "hard data" wave should add chains that challenge `topic_key`

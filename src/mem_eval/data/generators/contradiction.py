@@ -7,24 +7,25 @@ CURRENT value and not any stale one.
 Gold = current fact id + the set of superseded ids that must NOT win.
 Primary metrics: contradiction-resolution accuracy, staleness.
 
-EMERGENT, not templated. Earlier this category hardcoded a crowded/sparse split
-(i % 2) so NaiveRAG's accuracy was a fixed 0.5 by construction. It is now a
-difficulty-stratified, RNG-driven distribution: each scenario draws an update
-chain length (1-3) and a same-topic distractor density (0..MAX_DISTRACTORS).
-Consequently the metric values fall out of the *data* and *backend mechanism*,
-and vary across seeds, rather than being designed:
+EMERGENT, not templated, AND not tuned to the reference. Two difficulty axes,
+both RNG-driven and difficulty-stratified with fixed anchors that guarantee the
+ordering for every seed while leaving the aggregate emergent:
 
-* NaiveRAG (pure cosine + recency tiebreak) has NO supersession mechanism, so it
-  returns stale chain versions whenever they survive the top-k cutoff — failing
-  the harder (long-chain / low-distractor) scenarios and only accidentally
-  passing the heavily-crowded ones. Its accuracy and staleness therefore depend
-  on the seed-drawn difficulty mix.
-* TemporalRAG consolidates the whole same-topic chain (keeps the latest), so it
-  resolves contradictions regardless of chain length or distractor density.
+1. Crowding / chain length — how many same-topic distractors and how long the
+   update chain. Controls whether NaiveRAG (no supersession mechanism) accidentally
+   sheds stale versions; its accuracy varies by seed.
+2. Phrasing — `possessive` ("Alice's current phone number is X", which the
+   reference's surface parser can consolidate) vs `coreference` ("Their current
+   phone number is X", which drops the subject so the reference CANNOT bind the
+   update to the chain). Coreference scenarios leave headroom ABOVE the reference:
+   TemporalRAG cannot resolve them, so its contradiction accuracy is emergent and
+   strictly < 1.0 — the benchmark is demonstrably NOT co-designed to let its own
+   reference win.
 
-The harness thus separates a contradiction-aware backend from a naive one as an
-emergent property: TemporalRAG.accuracy >> NaiveRAG.accuracy > NoMemory == 0,
-and NaiveRAG.staleness > TemporalRAG.staleness == 0, on data it did not tune to.
+Anchors (every seed): scenario 0 easy (naive passes by crowding, reference passes
+by consolidation); scenario 1 hard-for-naive (long chain, no crowding — naive
+fails, reference passes) guarantees reference > naive; scenario 2 hard-for-
+reference (coreference, no crowding — both fail) guarantees reference < 1.0.
 """
 
 from __future__ import annotations
@@ -45,10 +46,8 @@ MAX_UPDATES = 3          # chain length 1..MAX_UPDATES (superseded versions)
 # max so the stale fact is pushed below the top-k cutoff across the tested k-band
 # (>= 20), guaranteeing NaiveRAG passes at least one scenario for every seed.
 MAX_DISTRACTORS = 24
+COREF_RATE = 0.4         # fraction of RNG scenarios that use coreference phrasing
 
-# Paraphrase templates for intermediate/old assertions — adds surface variety so
-# retrieval is not a fixed string match. All keep a copula so the topic key
-# (subject + attribute, temporal markers stripped) parses consistently.
 _OLD_TEMPLATES = [
     "{e}'s previous {a} was {v}.",
     "Earlier, {e}'s {a} was {v}.",
@@ -69,24 +68,22 @@ def _distinct_values(voc: Vocab, key: str, n: int) -> list[str]:
         if v not in vals:
             vals.append(v)
         guard += 1
-    # pad deterministically if the value space is small
     while len(vals) < n:
         vals.append(f"{vals[-1]}-{len(vals)}")
     return vals
 
 
-def _difficulty(rng: Random, idx: int) -> tuple[int, int]:
-    """Difficulty stratification (standard benchmark practice). Two anchors pin
-    the ends of the gradient so the suite always spans easy->hard for EVERY seed:
-    scenario 0 is easy (naive accidentally passes), scenario 1 is hard (naive
-    cannot). The rest are RNG-drawn, so the aggregate metric is emergent — it
-    varies by seed — while the ordering (NoMemory < NaiveRAG < TemporalRAG) is
-    guaranteed by always having both a naive-passable and a naive-failing case."""
+def _difficulty(rng: Random, idx: int) -> tuple[int, int, str]:
+    """(chain length, distractor count, phrasing). Three anchors pin the gradient
+    for EVERY seed; the rest are RNG-drawn so the aggregate is emergent."""
     if idx == 0:
-        return 1, MAX_DISTRACTORS           # easy: single update, heavy crowding
+        return 1, MAX_DISTRACTORS, "possessive"        # easy: naive passes by crowding
     if idx == 1:
-        return MAX_UPDATES, 0               # hard: long chain, no crowding
-    return rng.randint(1, MAX_UPDATES), rng.randint(0, MAX_DISTRACTORS)
+        return MAX_UPDATES, 0, "possessive"            # hard-for-naive: reference > naive
+    if idx == 2:
+        return 1, 0, "coreference"                     # hard-for-reference: reference < 1.0
+    phrasing = "coreference" if rng.random() < COREF_RATE else "possessive"
+    return rng.randint(1, MAX_UPDATES), rng.randint(0, MAX_DISTRACTORS), phrasing
 
 
 def _scenario(rng: Random, idx: int):
@@ -95,22 +92,19 @@ def _scenario(rng: Random, idx: int):
     entity = voc.entity()
     attr, key = voc.attribute()
 
-    n_updates, n_distractors = _difficulty(rng, idx)  # superseded versions, crowding
-    versions = _distinct_values(voc, key, n_updates + 1)  # v0..v_{n_updates}
+    n_updates, n_distractors, phrasing = _difficulty(rng, idx)
+    versions = _distinct_values(voc, key, n_updates + 1)
 
     day = 0
     chain_ids: list[str] = []
 
-    # oldest assertion (day 0)
     s0 = p.session(day)
     old0 = new_fact(f"contra-{idx}-v0", entity, attr, versions[0])
     p.add_turn(s0, rng.choice(_OLD_TEMPLATES).format(e=entity, a=attr, v=versions[0]), fact=old0)
     chain_ids.append(old0.fact_id)
     day += 1
 
-    # distractors + intermediate updates interleaved on a shared timeline
-    distractor_days = list(range(day, day + n_distractors))
-    for d in distractor_days:
+    for d in range(day, day + n_distractors):
         de = voc.entity()
         dv = voc.value(key)
         sd = p.session(d)
@@ -118,7 +112,6 @@ def _scenario(rng: Random, idx: int):
         p.add_turn(sd, f"{de}'s current {attr} is {dv}.", fact=df)
     day += n_distractors
 
-    # intermediate (still superseded) updates v1..v_{n_updates-1}
     for i in range(1, n_updates):
         sd = p.session(day)
         mid = new_fact(f"contra-{idx}-v{i}", entity, attr, versions[i])
@@ -126,10 +119,16 @@ def _scenario(rng: Random, idx: int):
         chain_ids.append(mid.fact_id)
         day += 1
 
-    # the current value (most recent) supersedes everything before it
+    # the current value (most recent) supersedes everything before it.
+    # In coreference phrasing the subject is a pronoun, so a surface parser cannot
+    # bind this update to the entity's chain (the reference's consolidation fails).
     sd = p.session(day)
     cur = new_fact(f"contra-{idx}-cur", entity, attr, versions[n_updates])
-    p.add_turn(sd, f"{entity}'s current {attr} is {versions[n_updates]}.", fact=cur)
+    if phrasing == "coreference":
+        cur_text = f"Their current {attr} is {versions[n_updates]}."
+    else:
+        cur_text = f"{entity}'s current {attr} is {versions[n_updates]}."
+    p.add_turn(sd, cur_text, fact=cur)
     for old_id in chain_ids:
         p.link_supersession(old_id, cur.fact_id)
 
@@ -151,4 +150,4 @@ def generate(rng: Random, count: int = 10) -> list:
     return [_scenario(rng, i) for i in range(count)]
 
 
-__all__ = ["generate", "MAX_UPDATES", "MAX_DISTRACTORS"]
+__all__ = ["generate", "MAX_UPDATES", "MAX_DISTRACTORS", "COREF_RATE"]

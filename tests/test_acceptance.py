@@ -194,11 +194,12 @@ def test_meaningful_spectrum_reference_beats_naive(seed):
     naive = run_eval(get_backend("naive_rag"), s, k=10)["metrics"]
     temporal = run_eval(get_backend("temporal_rag"), s, k=10)["metrics"]
 
-    # contradiction: floor < naive < good reference
+    # contradiction: floor < naive < good reference, with HEADROOM above the
+    # reference (the benchmark is not tuned to let its own reference score 1.0).
     ca_nm = nomem["overall"]["contradiction_resolution_accuracy"]
     ca_nr = naive["overall"]["contradiction_resolution_accuracy"]
     ca_tr = temporal["overall"]["contradiction_resolution_accuracy"]
-    assert ca_nm < ca_nr < ca_tr, (ca_nm, ca_nr, ca_tr)
+    assert ca_nm < ca_nr < ca_tr < 1.0, (ca_nm, ca_nr, ca_tr)
 
     # staleness: the good reference curates away stale items the naive one returns
     assert (
@@ -209,6 +210,21 @@ def test_meaningful_spectrum_reference_beats_naive(seed):
     # retrieval quality: reference is at least as good and strictly beats the floor
     assert nomem["overall"]["recall_at_k"] < naive["overall"]["recall_at_k"]
     assert naive["overall"]["recall_at_k"] <= temporal["overall"]["recall_at_k"]
+
+
+def test_reference_has_emergent_headroom():
+    """The contradiction-aware reference must NOT score a flat 1.0 — that would
+    look like the benchmark is co-designed to let its own reference win. Adversarial
+    coreference phrasing it cannot resolve leaves headroom, so its accuracy is < 1.0
+    and varies across seeds (emergent), leaving room for a real system to claim."""
+    vals = [
+        run_eval(get_backend("temporal_rag"), build_suite("v1", seed=s), k=10)["metrics"][
+            "overall"
+        ]["contradiction_resolution_accuracy"]
+        for s in range(40, 52)
+    ]
+    assert all(v < 1.0 for v in vals), f"reference scored a suspicious 1.0: {vals}"
+    assert len(set(vals)) >= 3, f"reference score looks templated, not emergent: {vals}"
 
 
 def test_discrimination_is_emergent_not_constant():

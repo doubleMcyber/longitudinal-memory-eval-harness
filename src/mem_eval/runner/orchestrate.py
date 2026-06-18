@@ -139,6 +139,7 @@ def run_eval(
         "embedding_model": EMBEDDING_MODEL,
         "answer_judge": judge.name,
         "judge_model": getattr(judge, "model", None),
+        "pricing_model": "token-rate-v1 (modeled, not measured)",
         "python": platform.python_version(),
         "platform": platform.platform(),
         "timestamp": timestamp or datetime.now().isoformat(timespec="seconds"),

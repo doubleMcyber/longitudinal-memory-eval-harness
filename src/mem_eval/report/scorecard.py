@@ -97,8 +97,8 @@ _COMPARE_ROWS = [
     ("contradiction_acc ±95%CI", lambda m: _ci_hw(m, "contradiction_resolution_accuracy")),
     ("staleness", lambda m: m["staleness"]),
     ("answer_acc", lambda m: m["answer_accuracy"]),
-    ("latency_p50_ms", lambda m: m["latency_ms"]["p50"]),
-    ("cost_per_query_usd", lambda m: m["cost_per_query_usd"]),
+    ("latency_p50_ms (in-proc)", lambda m: m["latency_ms"]["p50"]),
+    ("cost_per_query_usd (modeled)", lambda m: m["cost_per_query_usd"]),
     ("storage_growth_slope", lambda m: m["storage"]["growth_slope"]),
 ]
 
@@ -114,6 +114,10 @@ def compare_scorecards(scorecards: list[dict]) -> str:
     sep = "| --- | " + " | ".join(["---"] * len(names)) + " |"
     lines = [
         f"# mem-eval compare ({scorecards[0]['dataset']['suite']}, seed {scorecards[0]['dataset']['seed']})",
+        "",
+        "_Quality metrics (recall/precision/contradiction/staleness) are measured and "
+        "carry CIs. Operational rows are a deterministic MODEL for relative comparison: "
+        "cost is priced from token counts, latency is in-process — not infra measurements._",
         "",
         header,
         sep,
