@@ -134,7 +134,7 @@
       "category": "needle",
       "sessions": [
         {"session_id": "needle-s0", "timestamp": "2025-01-01T08:00:00", "turns": [
-          {"turn_id": "needle-s0-t0", "role": "user", "text": "Important for the building: the server-room door code is 4417."},
+          {"turn_id": "needle-s0-t0", "role": "user", "text": "Important for the building: the server-room door code is 7392."},
           {"turn_id": "needle-s0-t1", "role": "assistant", "text": "Noted the door code."}
         ]},
         {"session_id": "needle-s1", "timestamp": "2025-01-08T09:00:00", "turns": [
@@ -166,7 +166,7 @@
         {"query_id": "rl-needle-q0", "category": "needle",
          "prompt": "What is the server-room door code?",
          "as_of": "2025-04-01T00:00:00",
-         "gold_answer": "4417",
+         "gold_answer": "7392",
          "support": [{"session": "needle-s0", "turn": "needle-s0-t0"}]}
       ]
     },
