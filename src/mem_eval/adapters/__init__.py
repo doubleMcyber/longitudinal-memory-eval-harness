@@ -12,6 +12,7 @@ from mem_eval.adapters.base import (
     Turn,
     Usage,
 )
+from mem_eval.adapters.configurable_rag import ConfigurableRAG
 from mem_eval.adapters.curated_brain import CuratedBrain
 from mem_eval.adapters.letta import Letta
 from mem_eval.adapters.long_context import LongContext
@@ -33,13 +34,19 @@ REFERENCES: dict[str, type] = {
     TemporalRAG.name: TemporalRAG,
 }
 
+# Integration backends: real-stack seams. ConfigurableRAG takes an injected
+# EmbeddingFn (default offline == NaiveRAG; plug in a real embedding model).
+INTEGRATIONS: dict[str, type] = {
+    ConfigurableRAG.name: ConfigurableRAG,
+}
+
 # Documented stubs (interface-complete, raise NotImplementedError until wired).
 STUBS: dict[str, type] = {
     Letta.name: Letta,
     CuratedBrain.name: CuratedBrain,
 }
 
-REGISTRY: dict[str, type] = {**BASELINES, **REFERENCES, **STUBS}
+REGISTRY: dict[str, type] = {**BASELINES, **REFERENCES, **INTEGRATIONS, **STUBS}
 
 
 def get_backend(name: str) -> MemoryBackend:
@@ -52,6 +59,7 @@ def get_backend(name: str) -> MemoryBackend:
 __all__ = [
     "BASELINES",
     "REFERENCES",
+    "INTEGRATIONS",
     "STUBS",
     "REGISTRY",
     "get_backend",
@@ -59,6 +67,7 @@ __all__ = [
     "LongContext",
     "NaiveRAG",
     "TemporalRAG",
+    "ConfigurableRAG",
     "Letta",
     "CuratedBrain",
     "MemoryBackend",
