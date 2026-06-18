@@ -42,13 +42,22 @@ production-ready — a planning pass surfaced credibility-gating gaps:
 - **D4** no curation-stress / poisoning scenarios; `consolidate()` never bites.
 - **D5** modeled cost/latency rendered beside quality without a "modeled" caveat.
 
-## Cycle 2 (highest leverage first)
-- **Wave 5 (D2 + D5)**: adversarial contradiction phrasing (coreference) that defeats `topic_key`, so
-  TemporalRAG's contradiction score is emergent and < 1.0 with headroom, while NaiveRAG < TemporalRAG
-  stays guaranteed. Label modeled cost/latency.
-- **Wave 6 (D1)**: lexical-gap (paraphrase) slice + offline semantic embedding demonstrator so a
-  semantic embedding provably beats lexical — making the EmbeddingFn seam meaningful.
-- **Later**: curation-stress (D4), labeled real-log suite + validity study (D3).
+## Cycle 2 (DONE — closed the cardinal credibility issues + curation pillar)
+- **Wave 5 (D2 + D5) ✅**: adversarial coreference phrasing defeats `topic_key`; TemporalRAG contradiction
+  is emergent and < 1.0 with headroom; NaiveRAG < TemporalRAG guaranteed. Modeled ops labeled.
+- **Wave 6 (D1) ✅**: structural lexical gap (token-cosine recall = 0 across 120 seeds) + offline semantic
+  embedding (SynonymHashEmbedding) + SemanticRAG; semantic provably beats lexical — the seam is meaningful.
+- **Wave 7 (D4) ✅**: real `TemporalRAG.consolidate()` (exact-duplicate compaction, time-discipline safe) +
+  curation-stress test; curated storage stays flat (slope ~1.4) vs naive (slope 55). The curation pillar is live.
+
+The scoreboard is now genuinely multi-axis: **semantic_rag** wins retrieval, **temporal_rag** wins
+curation+contradiction (with headroom < 1.0), neither dominates — a real system must do all three.
+
+## Remaining (next cycle — adoption-scale, not credibility-gating)
+- **D3**: a meaningfully-sized labeled real-log suite + an external-validity study (Spearman correlation of
+  synthetic vs real rankings). The path/format/IAA already ship; this is a human-labeling research effort.
+- **Planner item 7**: give multi_hop / recency_relevance the same RNG-stratified emergent treatment.
+- Hosted leaderboard + tamper-checked submission format (held-out seeds).
 
 ## Carry-forward notes (from verification subagents)
 - **W1**: TemporalRAG scores a flat 1.0/0.0 on contradiction — the data never stresses its

@@ -88,7 +88,7 @@ class _Chunk:
 
 class TemporalRAG(BaseBackend):
     name = "temporal_rag"
-    version = "1.0.0"
+    version = "1.1.0"  # 1.1.0: consolidate() compacts exact-duplicate assertions
 
     # in 'recency' mode, items scoring at least this fraction of the best cosine
     # are considered "relevant enough" and then ordered by recency.
@@ -193,9 +193,21 @@ class TemporalRAG(BaseBackend):
         return QueryResult(items=items, answer=answer, usage=usage, latency_ms=0.0)
 
     def consolidate(self) -> Usage:
-        # Consolidation happens at query time from the immutable log; the hook is
-        # a no-op here (kept for contract symmetry).
-        return Usage()
+        """Curation hook (PRD §4.2): compact EXACT-duplicate assertions, keeping the
+        earliest copy. This is information-preserving (a repeated reminder carries no
+        new fact) and time-discipline safe (the earliest timestamp/provenance is
+        retained, so query(as_of=T) is unaffected). Under redundant re-assertion this
+        flattens storage growth vs an uncurated store — the curation-quality axis."""
+        seen: dict[str, _Chunk] = {}
+        for c in self._chunks:
+            kept = seen.get(c.text)
+            if kept is None or (c.timestamp, c.item_id) < (kept.timestamp, kept.item_id):
+                seen[c.text] = c
+        removed = len(self._chunks) - len(seen)
+        if removed:
+            self._chunks = sorted(seen.values(), key=lambda c: c.ord)
+        # bookkeeping cost proportional to what was scanned
+        return Usage(prompt_tokens=removed)
 
     def stats(self) -> BackendStats:
         topics = {c.topic for c in self._chunks if c.topic}
