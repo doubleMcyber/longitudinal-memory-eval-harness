@@ -17,6 +17,7 @@ from random import Random
 
 from mem_eval.data.generators import (
     contradiction,
+    lexical_gap,
     longitudinal,
     multi_hop,
     needle,
@@ -31,17 +32,17 @@ from mem_eval.data.schema import (
     Suite,
 )
 
-DATASET_VERSION = "2026.8"
+DATASET_VERSION = "2026.9"
 
 
 @dataclass(frozen=True)
 class SuiteConfig:
-    """Knobs controlling suite size/depth. Defaults == the `standard` preset and
-    reproduce the historical v1 data exactly."""
+    """Knobs controlling suite size/depth."""
 
     name: str = "standard"
     longitudinal_count: int = 3
     longitudinal_sessions: int = 12
+    lexical_gap_count: int = 3
     contradiction_count: int = 10
     multi_hop_count: int = 3
     recency_count: int = 2
@@ -51,13 +52,13 @@ class SuiteConfig:
 
 PRESETS: dict[str, SuiteConfig] = {
     "small": SuiteConfig(
-        name="small", longitudinal_count=2, longitudinal_sessions=6,
+        name="small", longitudinal_count=2, longitudinal_sessions=6, lexical_gap_count=1,
         contradiction_count=4, multi_hop_count=2, recency_count=1,
         needle_count=1, needle_depth=10,
     ),
     "standard": SuiteConfig(),
     "large": SuiteConfig(
-        name="large", longitudinal_count=6, longitudinal_sessions=40,
+        name="large", longitudinal_count=6, longitudinal_sessions=40, lexical_gap_count=6,
         contradiction_count=20, multi_hop_count=6, recency_count=4,
         needle_count=4, needle_depth=80,
     ),
@@ -93,6 +94,7 @@ def build_suite(
     scenarios += longitudinal.generate(
         _category_rng(seed, 0), count=cfg.longitudinal_count, num_sessions=cfg.longitudinal_sessions
     )
+    scenarios += lexical_gap.generate(_category_rng(seed, 5), count=cfg.lexical_gap_count)
     scenarios += contradiction.generate(_category_rng(seed, 1), count=cfg.contradiction_count)
     scenarios += multi_hop.generate(_category_rng(seed, 2), count=cfg.multi_hop_count)
     scenarios += recency_relevance.generate(_category_rng(seed, 3), count=cfg.recency_count)

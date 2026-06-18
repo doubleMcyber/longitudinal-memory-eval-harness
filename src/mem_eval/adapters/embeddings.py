@@ -81,6 +81,52 @@ class HashEmbedding:
         return dot / (na * nb) if na and nb else 0.0
 
 
+class SynonymHashEmbedding:
+    """Deterministic offline SEMANTIC embedding demonstrator. Like HashEmbedding,
+    but additionally hashes a concept bucket for any token in a synonym lexicon,
+    so paraphrases of the same relation collide on a shared dimension. This bridges
+    the lexical gap that defeats token-cosine — demonstrating, fully offline and
+    reproducibly, that a better embedding beats lexical retrieval (the production
+    signal comes from real models plugged through the same EmbeddingFn seam).
+
+    The lexicon is generic world knowledge (synonym sets), not gold."""
+
+    def __init__(self, lexicon: dict[str, str] | None = None, dim: int = 256,
+                 concept_weight: float = 2.0) -> None:
+        if lexicon is None:
+            from mem_eval.data.paraphrase import TOKEN_CONCEPT
+
+            lexicon = TOKEN_CONCEPT
+        self.lexicon = lexicon
+        self.dim = dim
+        self.concept_weight = concept_weight
+        self.name = f"synonym-hash-{dim}"
+
+    @staticmethod
+    def _bucket(token: str, dim: int):
+        h = int(hashlib.blake2b(token.encode(), digest_size=8).hexdigest(), 16)
+        return h % dim, (1.0 if (h >> 8) & 1 else -1.0)
+
+    def embed(self, text: str) -> list[float]:
+        vec = [0.0] * self.dim
+        for tok in vectorize(text):
+            idx, sign = self._bucket(tok, self.dim)
+            vec[idx] += sign
+            concept = self.lexicon.get(tok)
+            if concept:
+                cidx, csign = self._bucket(f"CONCEPT:{concept}", self.dim)
+                vec[cidx] += csign * self.concept_weight
+        return vec
+
+    def similarity(self, a: Sequence[float], b: Sequence[float]) -> float:
+        dot = sum(x * y for x, y in zip(a, b))
+        if dot == 0:
+            return 0.0
+        na = math.sqrt(sum(x * x for x in a))
+        nb = math.sqrt(sum(y * y for y in b))
+        return dot / (na * nb) if na and nb else 0.0
+
+
 class _LazyEmbeddingStub:
     """Base for integration stubs that need an optional dependency."""
 
@@ -122,6 +168,7 @@ __all__ = [
     "EmbeddingFn",
     "TokenCosineEmbedding",
     "HashEmbedding",
+    "SynonymHashEmbedding",
     "SentenceTransformerEmbedding",
     "OpenAIEmbedding",
 ]

@@ -12,7 +12,7 @@ from mem_eval.adapters.base import (
     Turn,
     Usage,
 )
-from mem_eval.adapters.configurable_rag import ConfigurableRAG
+from mem_eval.adapters.configurable_rag import ConfigurableRAG, SemanticRAG
 from mem_eval.adapters.curated_brain import CuratedBrain
 from mem_eval.adapters.letta import Letta
 from mem_eval.adapters.long_context import LongContext
@@ -38,6 +38,7 @@ REFERENCES: dict[str, type] = {
 # EmbeddingFn (default offline == NaiveRAG; plug in a real embedding model).
 INTEGRATIONS: dict[str, type] = {
     ConfigurableRAG.name: ConfigurableRAG,
+    SemanticRAG.name: SemanticRAG,
 }
 
 # Documented stubs (interface-complete, raise NotImplementedError until wired).
@@ -68,6 +69,7 @@ __all__ = [
     "NaiveRAG",
     "TemporalRAG",
     "ConfigurableRAG",
+    "SemanticRAG",
     "Letta",
     "CuratedBrain",
     "MemoryBackend",
