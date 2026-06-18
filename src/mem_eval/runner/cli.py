@@ -67,6 +67,17 @@ def _cmd_iaa(args) -> int:
     return 0
 
 
+def _cmd_validity(args) -> int:
+    from mem_eval.data.importers.transcript import DEFAULT_CORPUS
+    from mem_eval.validity import render_validity_report, run_default_study
+
+    report = run_default_study(
+        seed=args.seed, scale=args.scale, corpus_path=args.corpus or DEFAULT_CORPUS, k=args.k
+    )
+    sys.stdout.write(render_validity_report(report))
+    return 0
+
+
 def _cmd_depth(args) -> int:
     depths = tuple(int(d) for d in args.depths.split(",")) if args.depths else DEFAULT_DEPTHS
     curve = depth_curve(args.backend, seed=args.seed, depths=depths, k=args.k)
@@ -140,6 +151,14 @@ def build_parser() -> argparse.ArgumentParser:
     a.add_argument("--transcript", required=True)
     a.add_argument("--annotations", required=True, help="multi-annotator JSON sidecar")
     a.set_defaults(func=_cmd_iaa)
+
+    v = sub.add_parser("validity",
+                       help="external-validity study: synthetic vs real-log rank correlation")
+    v.add_argument("--seed", type=int, default=42)
+    v.add_argument("--k", type=int, default=DEFAULT_K)
+    v.add_argument("--scale", choices=sorted(PRESETS), default=None)
+    v.add_argument("--corpus", default=None, help="real-log corpus.json (default: shipped corpus)")
+    v.set_defaults(func=_cmd_validity)
     return p
 
 
