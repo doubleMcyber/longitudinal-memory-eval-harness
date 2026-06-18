@@ -1,0 +1,14 @@
+{
+  "category": "longitudinal_recall",
+  "note": "Hand-annotated high-confidence gold (PRD §9 tier a). Support refs use the transcript's explicit turn_id values.",
+  "queries": [
+    {
+      "query_id": "real-q0",
+      "category": "longitudinal_recall",
+      "prompt": "Which backup email did I give for account recovery?",
+      "as_of": "2025-04-20T15:00:00",
+      "gold_answer": "vault-keeper@proton.me",
+      "support": [{"session": "r-s0", "turn": "r-s0-t000"}]
+    }
+  ]
+}

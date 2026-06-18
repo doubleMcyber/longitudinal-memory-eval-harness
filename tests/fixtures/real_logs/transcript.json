@@ -1,0 +1,28 @@
+{
+  "sessions": [
+    {
+      "session_id": "r-s0",
+      "timestamp": "2025-03-01T09:00:00",
+      "turns": [
+        {"turn_id": "r-s0-t000", "role": "user", "text": "Hi, setting things up. My primary backup email is vault-keeper@proton.me for account recovery."},
+        {"turn_id": "r-s0-t001", "role": "assistant", "text": "Noted, I'll remember that backup email for account recovery."}
+      ]
+    },
+    {
+      "session_id": "r-s1",
+      "timestamp": "2025-03-05T10:00:00",
+      "turns": [
+        {"turn_id": "r-s1-t000", "role": "user", "text": "Different topic: remind me to water the office plants on Fridays."},
+        {"turn_id": "r-s1-t001", "role": "assistant", "text": "Reminder set for watering the plants on Fridays."}
+      ]
+    },
+    {
+      "session_id": "r-s2",
+      "timestamp": "2025-03-19T16:30:00",
+      "turns": [
+        {"turn_id": "r-s2-t000", "role": "user", "text": "We discussed travel budgets and the quarterly report deadlines today."},
+        {"turn_id": "r-s2-t001", "role": "assistant", "text": "Summarized the travel budget and the quarterly report deadlines."}
+      ]
+    }
+  ]
+}

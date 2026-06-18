@@ -1,0 +1,120 @@
+"""Real conversation-log importer (PRD §9).
+
+Maps external transcripts into the Session schema and combines them with a
+manual annotation sidecar (query -> gold answer + supporting item refs + as_of +
+category) to produce a Scenario that runs end-to-end through the *same* metrics.
+
+Annotation format: JSON in v1 (stdlib-only so the gate has no extra deps). If a
+``.yaml``/``.yml`` sidecar is given and PyYAML is importable, it is parsed too;
+otherwise JSON is assumed. (PRD names a YAML sidecar; the schema is identical.)
+
+The optional LLM-assisted label proposal (PRD §9 tier b) is a documented stub:
+it pre-fills a sidecar skeleton explicitly flagged low-confidence for human
+review and does not invent gold.
+"""
+
+from __future__ import annotations
+
+import json
+from datetime import datetime
+
+from mem_eval.adapters.base import Session, Turn
+from mem_eval.data.schema import Query, Scenario
+
+
+def import_sessions(raw_sessions: list[dict]) -> list[Session]:
+    """raw_sessions: [{session_id, timestamp(ISO), turns:[{role,text[,turn_id]}]}]."""
+    sessions = []
+    for rs in raw_sessions:
+        ts = datetime.fromisoformat(rs["timestamp"])
+        turns = []
+        for i, t in enumerate(rs["turns"]):
+            tid = t.get("turn_id") or f"{rs['session_id']}-t{i:03d}"
+            turns.append(Turn(turn_id=tid, role=t.get("role", "user"), text=t["text"]))
+        sessions.append(Session(session_id=rs["session_id"], timestamp=ts, turns=turns))
+    return sessions
+
+
+def load_annotation(path: str) -> dict:
+    if path.endswith((".yaml", ".yml")):
+        try:
+            import yaml  # type: ignore
+        except ImportError as exc:  # pragma: no cover - depends on env
+            raise RuntimeError(
+                "YAML sidecar requested but PyYAML is not installed; use a JSON sidecar."
+            ) from exc
+        with open(path) as fh:
+            return yaml.safe_load(fh)
+    with open(path) as fh:
+        return json.load(fh)
+
+
+def _ref(r: dict) -> str:
+    """A supporting-item reference (session, turn) -> stable id used for grading."""
+    return f"{r['session']}:{r['turn']}"
+
+
+def build_scenario_from_logs(
+    transcript_path: str,
+    sidecar_path: str,
+    scenario_id: str = "real-sample",
+) -> Scenario:
+    with open(transcript_path) as fh:
+        transcript = json.load(fh)
+    sessions = import_sessions(transcript["sessions"])
+
+    # Every turn gets a stable grading id so any returned item resolves to a ref.
+    turn_to_fact = {
+        (s.session_id, t.turn_id): f"{s.session_id}:{t.turn_id}"
+        for s in sessions
+        for t in s.turns
+    }
+
+    ann = load_annotation(sidecar_path)
+    queries = []
+    for qa in ann["queries"]:
+        queries.append(
+            Query(
+                query_id=qa["query_id"],
+                category=qa["category"],
+                prompt=qa["prompt"],
+                as_of=datetime.fromisoformat(qa["as_of"]),
+                gold_answer=qa["gold_answer"],
+                gold_support=tuple(_ref(r) for r in qa.get("support", [])),
+                gold_superseded=tuple(_ref(r) for r in qa.get("superseded", [])),
+                intent=qa.get("intent"),
+                k=qa.get("k"),
+            )
+        )
+    category = ann.get("category") or (queries[0].category if queries else "real_logs")
+    return Scenario(
+        scenario_id=scenario_id,
+        category=category,
+        sessions=sessions,
+        facts=[],  # real logs carry no constructed structured layer
+        queries=queries,
+        turn_to_fact=turn_to_fact,
+    )
+
+
+def propose_labels(transcript_path: str) -> dict:
+    """LLM-assisted label proposal — STUB (PRD §9 tier b).
+
+    Returns a sidecar skeleton flagged low-confidence so a human must review and
+    fill the gold. It does NOT fabricate gold answers/support."""
+    with open(transcript_path) as fh:
+        transcript = json.load(fh)
+    return {
+        "low_confidence": True,
+        "note": "LLM-assisted proposals are a documented stub; fill gold by hand (PRD §9).",
+        "queries": [],
+        "_sessions_seen": [s["session_id"] for s in transcript["sessions"]],
+    }
+
+
+__all__ = [
+    "import_sessions",
+    "load_annotation",
+    "build_scenario_from_logs",
+    "propose_labels",
+]
