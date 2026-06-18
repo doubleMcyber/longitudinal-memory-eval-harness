@@ -48,6 +48,7 @@ PYTHONPATH=src python -m mem_eval.runner.cli compare results/*.json          # s
 PYTHONPATH=src python -m mem_eval.runner.cli gen   --suite v1 --seed 42 --scale large --out datasets/
 PYTHONPATH=src python -m mem_eval.runner.cli depth --backend naive_rag --depths 8,16,32,64
 PYTHONPATH=src python -m mem_eval.runner.cli iaa   --transcript T.json --annotations multi.json
+PYTHONPATH=src python -m mem_eval.runner.cli validity                  # synthetic vs real-log rank correlation
 ```
 
 ## Test categories (5) and metrics (7)
@@ -102,6 +103,25 @@ sidecar (JSON; YAML supported when PyYAML is present), and run them through the
 *same* metrics. Multi-annotator gold is vetted with **inter-annotator agreement**
 (Cohen's κ on support membership + answer agreement) before admission.
 
+A meaningfully-sized real-STYLE corpus ships at
+[`corpora/real_logs_v1/`](corpora/real_logs_v1/) (8 hand-authored scenarios, 27
+sessions, 3 annotators; κ ≈ 0.88). It is a curated stand-in for human-collected
+production logs — gold is hand-labeled in the structured layer, never inferred —
+and a genuine labeled corpus of the same format is a drop-in replacement.
+
+### External validity (does synthetic predict real?)
+
+`mem-eval validity` ranks a panel of backends on **both** the synthetic suite and
+the real corpus by a transparent quality composite, then reports **Spearman ρ**
+(headline), Kendall τ, and an exact permutation p-value, with a per-axis
+decomposition. On the shipped data the orderings are **identical** —
+`temporal_rag` wins both, `no_memory` floors both — giving **ρ = 1.0**
+(τ = 1.0, p ≈ 0.017), with positive transfer on every axis (recall, precision,
+contradiction, answer). Evidence that the cheap, gold-exact synthetic suite is a
+valid proxy for the expensive hand-labeled real one. The claim is bounded: to the
+extent real logs exercise these capabilities, the synthetic ranking predicts the
+real one.
+
 ## Repo layout
 
 ```
@@ -111,9 +131,12 @@ src/mem_eval/
               letta/curated_brain (stubs)
   data/       schema.py, suite.py (scale presets), generators/, importers/
   grading/    judge.py (answer grading), agreement.py (IAA)
-  metrics/    recall/precision/contradiction/staleness/latency/cost/storage + significance
+  metrics/    recall/precision/contradiction/staleness/latency/cost/storage
+              significance (bootstrap CIs) + correlation (Spearman/Kendall)
+  validity/   study.py (synthetic vs real-log external-validity study)
   runner/     orchestrate.py, cli.py, analyze.py (depth)
   report/     scorecard.py (JSON + markdown compare + determinism hash)
+corpora/      real_logs_v1/ (hand-authored real-style corpus + 3-annotator labels)
 tests/        acceptance suite (A1–A7) + per-feature tests
 ```
 
