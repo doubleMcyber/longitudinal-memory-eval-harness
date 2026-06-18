@@ -65,8 +65,10 @@ def test_label_proposal_is_flagged_low_confidence():
 
 
 def test_stub_registry_complete():
+    from mem_eval.adapters import INTEGRATIONS
+
     assert set(STUBS) == {"letta", "curated_brain"}
-    assert REGISTRY == {**BASELINES, **REFERENCES, **STUBS}
+    assert REGISTRY == {**BASELINES, **REFERENCES, **INTEGRATIONS, **STUBS}
 
 
 @pytest.mark.parametrize("name", list(STUBS))

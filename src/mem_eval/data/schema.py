@@ -66,6 +66,7 @@ class Query:
     gold_superseded: tuple[str, ...] = ()  # fact_ids that must NOT win (contradiction)
     intent: str | None = None  # INTENT_RECENCY | INTENT_RELEVANCE (category 4)
     k: int | None = None  # optional per-query override of retrieval depth
+    answer_aliases: tuple[str, ...] = ()  # accepted surface variants of gold_answer
 
 
 @dataclass
@@ -140,6 +141,7 @@ def _query_repr(q: Query) -> dict:
         "gold_superseded": list(q.gold_superseded),
         "intent": q.intent,
         "k": q.k,
+        "answer_aliases": list(q.answer_aliases),
     }
 
 

@@ -14,8 +14,9 @@ from time import perf_counter
 
 from mem_eval.adapters.base import MemoryBackend, Usage
 from mem_eval.data.schema import Suite, superseded_as_of
+from mem_eval.grading.judge import DEFAULT_JUDGE, AnswerJudge
 from mem_eval.metrics import compute_metrics_block, storage_growth
-from mem_eval.metrics.records import EvalRecord, normalized_answer_correct
+from mem_eval.metrics.records import EvalRecord
 from mem_eval.report.scorecard import build_scorecard
 
 DEFAULT_K = 10
@@ -30,7 +31,7 @@ def _consolidate_if(backend: MemoryBackend, when: str, cadence: str) -> Usage:
     return Usage()
 
 
-def _evaluate_scenario(backend: MemoryBackend, scenario, k: int, cadence: str):
+def _evaluate_scenario(backend: MemoryBackend, scenario, k: int, cadence: str, judge: AnswerJudge):
     backend.reset()
     ingest = Usage()
     for sess in sorted(scenario.sessions, key=lambda s: s.timestamp):
@@ -50,7 +51,7 @@ def _evaluate_scenario(backend: MemoryBackend, scenario, k: int, cadence: str):
         if q.as_of not in sup:
             sup[q.as_of] = superseded_as_of(scenario, q.as_of)
         superseded_returned = sum(1 for fid in resolved if fid in sup[q.as_of])
-        answer_correct = normalized_answer_correct(res.answer, q.gold_answer)
+        answer_correct = judge.judge(res.answer, q.gold_answer, q.answer_aliases)
 
         records.append(
             EvalRecord(
@@ -102,12 +103,14 @@ def run_eval(
     *,
     k: int = DEFAULT_K,
     consolidate_cadence: str = DEFAULT_CADENCE,
+    judge: AnswerJudge | None = None,
     timestamp: str | None = None,
 ) -> dict:
+    judge = judge or DEFAULT_JUDGE
     all_records: list[EvalRecord] = []
     ingest_total = Usage()
     for scenario in suite.scenarios:
-        recs, ingest = _evaluate_scenario(backend, scenario, k, consolidate_cadence)
+        recs, ingest = _evaluate_scenario(backend, scenario, k, consolidate_cadence, judge)
         all_records.extend(recs)
         ingest_total = ingest_total + ingest
 
@@ -126,6 +129,8 @@ def run_eval(
         "git_sha": _git_sha(),
         "model": MODEL,
         "embedding_model": EMBEDDING_MODEL,
+        "answer_judge": judge.name,
+        "judge_model": getattr(judge, "model", None),
         "timestamp": timestamp or datetime.now().isoformat(timespec="seconds"),
     }
     return build_scorecard(
