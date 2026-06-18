@@ -14,14 +14,15 @@ import os
 import sys
 
 from mem_eval.adapters import get_backend
-from mem_eval.data.suite import build_suite
+from mem_eval.data.suite import PRESETS, build_suite
 from mem_eval.data.schema import suite_content_hash
 from mem_eval.report.scorecard import compare_scorecards, write_scorecard
+from mem_eval.runner.analyze import DEFAULT_DEPTHS, depth_curve, render_depth_curve
 from mem_eval.runner.orchestrate import DEFAULT_CADENCE, DEFAULT_K, run_eval
 
 
 def _cmd_run(args) -> int:
-    suite = build_suite(args.suite, seed=args.seed)
+    suite = build_suite(args.suite, seed=args.seed, scale=args.scale)
     backend = get_backend(args.backend)
     scorecard = run_eval(
         backend, suite, k=args.k, consolidate_cadence=args.consolidate_cadence
@@ -50,13 +51,21 @@ def _cmd_compare(args) -> int:
     return 0
 
 
+def _cmd_depth(args) -> int:
+    depths = tuple(int(d) for d in args.depths.split(",")) if args.depths else DEFAULT_DEPTHS
+    curve = depth_curve(args.backend, seed=args.seed, depths=depths, k=args.k)
+    sys.stdout.write(render_depth_curve(args.backend, curve))
+    return 0
+
+
 def _cmd_gen(args) -> int:
-    suite = build_suite(args.suite, seed=args.seed)
+    suite = build_suite(args.suite, seed=args.seed, scale=args.scale)
     os.makedirs(args.out, exist_ok=True)
     payload = {
         "suite": suite.suite,
         "dataset_version": suite.dataset_version,
         "seed": suite.seed,
+        "scale": suite.config_name,
         "content_hash": suite_content_hash(suite),
         "num_scenarios": len(suite.scenarios),
         "num_queries": sum(len(s.queries) for s in suite.scenarios),
@@ -71,7 +80,7 @@ def _cmd_gen(args) -> int:
             for s in suite.scenarios
         ],
     }
-    path = os.path.join(args.out, f"{suite.suite}__seed{suite.seed}.json")
+    path = os.path.join(args.out, f"{suite.suite}__{suite.config_name}__seed{suite.seed}.json")
     with open(path, "w") as fh:
         json.dump(payload, fh, indent=2, sort_keys=True)
     print(f"wrote {path} (content_hash={payload['content_hash'][:16]}…)")
@@ -87,6 +96,8 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--suite", default="v1")
     r.add_argument("--seed", type=int, default=42)
     r.add_argument("--k", type=int, default=DEFAULT_K)
+    r.add_argument("--scale", choices=sorted(PRESETS), default=None,
+                   help="suite scale preset (default: standard)")
     r.add_argument("--consolidate-cadence", dest="consolidate_cadence", default=DEFAULT_CADENCE)
     r.add_argument("--out", default="results/")
     r.set_defaults(func=_cmd_run)
@@ -98,8 +109,16 @@ def build_parser() -> argparse.ArgumentParser:
     g = sub.add_parser("gen", help="materialize a dataset")
     g.add_argument("--suite", default="v1")
     g.add_argument("--seed", type=int, default=42)
+    g.add_argument("--scale", choices=sorted(PRESETS), default=None)
     g.add_argument("--out", default="datasets/")
     g.set_defaults(func=_cmd_gen)
+
+    d = sub.add_parser("depth", help="recall@k vs depth (#sessions) curve for a backend")
+    d.add_argument("--backend", required=True)
+    d.add_argument("--seed", type=int, default=42)
+    d.add_argument("--k", type=int, default=DEFAULT_K)
+    d.add_argument("--depths", default=None, help="comma-separated depths, e.g. 8,16,32,64")
+    d.set_defaults(func=_cmd_depth)
     return p
 
 

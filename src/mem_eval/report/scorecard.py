@@ -28,7 +28,12 @@ def determinism_hash(
 
     payload = {
         "backend": {"name": backend["name"], "version": backend["version"]},
-        "dataset": {"suite": dataset["suite"], "version": dataset["version"], "seed": dataset["seed"]},
+        "dataset": {
+            "suite": dataset["suite"],
+            "version": dataset["version"],
+            "seed": dataset["seed"],
+            "scale": dataset.get("scale", "standard"),
+        },
         "config": {"k": config["k"], "consolidate_cadence": config["consolidate_cadence"]},
         "overall": quality(metrics_block["overall"]),
         "by_category": {c: quality(metrics_block["by_category"][c]) for c in CATEGORIES},
@@ -38,7 +43,12 @@ def determinism_hash(
 
 
 def _run_id(backend: dict, dataset: dict, config: dict) -> str:
-    seed = f"{backend['name']}:{backend['version']}|{dataset['suite']}:{dataset['version']}:{dataset['seed']}|k={config['k']}:{config['consolidate_cadence']}"
+    scale = dataset.get("scale", "standard")
+    seed = (
+        f"{backend['name']}:{backend['version']}|"
+        f"{dataset['suite']}:{dataset['version']}:{dataset['seed']}:{scale}|"
+        f"k={config['k']}:{config['consolidate_cadence']}"
+    )
     return hashlib.sha256(seed.encode()).hexdigest()[:16]
 
 
@@ -66,7 +76,8 @@ def write_scorecard(scorecard: dict, out_dir: str) -> str:
     os.makedirs(out_dir, exist_ok=True)
     b = scorecard["backend"]["name"]
     d = scorecard["dataset"]
-    path = os.path.join(out_dir, f"{b}__{d['suite']}__seed{d['seed']}.json")
+    scale = d.get("scale", "standard")
+    path = os.path.join(out_dir, f"{b}__{d['suite']}__{scale}__seed{d['seed']}.json")
     with open(path, "w") as fh:
         json.dump(scorecard, fh, indent=2, sort_keys=True)
     return path
@@ -74,10 +85,16 @@ def write_scorecard(scorecard: dict, out_dir: str) -> str:
 
 # --- A6: compare ------------------------------------------------------------
 
+def _ci_hw(m: dict, key: str) -> float:
+    return m.get("ci95", {}).get(key, {}).get("half_width", 0.0)
+
+
 _COMPARE_ROWS = [
     ("recall@k", lambda m: m["recall_at_k"]),
+    ("recall@k ±95%CI", lambda m: _ci_hw(m, "recall_at_k")),
     ("precision@k", lambda m: m["precision_at_k"]),
     ("contradiction_acc", lambda m: m["contradiction_resolution_accuracy"]),
+    ("contradiction_acc ±95%CI", lambda m: _ci_hw(m, "contradiction_resolution_accuracy")),
     ("staleness", lambda m: m["staleness"]),
     ("answer_acc", lambda m: m["answer_accuracy"]),
     ("latency_p50_ms", lambda m: m["latency_ms"]["p50"]),
