@@ -8,10 +8,13 @@ hand-labeled gold, run through the *same* runner and metrics.
 ## What this is (and is not)
 
 - **Is**: a curated, hand-authored *stand-in* for human-collected production logs.
-  8 scenarios, 27 sessions, 9 queries, spanning five memory capabilities
-  (contradiction, longitudinal recall, lexical-gap paraphrase, needle-in-haystack,
-  multi-hop, recency). The surface text — entities, phrasings, distractors — is
-  independent of the synthetic generators.
+  8 scenarios, 27 sessions, 9 queries, spanning the five PRD categories
+  (contradiction, longitudinal recall, multi-hop, needle-in-haystack,
+  recency-vs-relevance). Two of the longitudinal-recall scenarios (`rl-reside`,
+  `rl-employer`) additionally embed a **lexical-gap / paraphrase** challenge — the
+  query and the supporting turn share meaning but no content tokens — which is the
+  seam that separates a semantic retriever from a lexical one. The surface text —
+  entities, phrasings, distractors — is independent of the synthetic generators.
 - **Is not**: genuinely human-*collected* logs. The honest claim the study makes
   is bounded accordingly (see below). A real human-collected, IAA-vetted corpus of
   this same format is a **drop-in replacement** — every line of the importer and
@@ -51,8 +54,11 @@ python -c "from mem_eval.data.importers.transcript import corpus_iaa; print(corp
 
 Cohen's κ is computed on the binary "is this turn supporting?" decision over each
 scenario's candidate turns, pooled across scenarios; answer agreement is exact
-(normalized) match. Low agreement would flag an ambiguous query or guideline
-before the gold is trusted.
+(normalized) match. It covers the 6 single-support queries the three annotators
+labeled in common (the remaining multi-hop and recency-vs-relevance queries are
+not in the IAA subset).
+Low agreement would flag an ambiguous query or guideline before the gold is
+trusted.
 
 ## How it is used (external validity)
 

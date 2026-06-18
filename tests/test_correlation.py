@@ -54,8 +54,9 @@ def test_kendall_tie_robust():
 def test_permutation_pvalue_perfect_correlation_is_significant():
     x = [1, 2, 3, 4, 5]
     y = [1, 2, 3, 4, 5]
-    # only 2 of 120 permutations are as extreme as rho=+1 (the identity and... none other);
-    # exact two-sided p for a perfect monotone relation on n=5 is 2/120.
+    # exactly 2 of 120 permutations reach |rho| = 1: the identity (rho=+1) and the
+    # full reversal (rho=-1). Two-sided exact p for a perfect monotone relation on
+    # n=5 is therefore 2/120.
     p = permutation_pvalue(x, y)
     assert math.isclose(p, 2 / 120, abs_tol=1e-9)
 
