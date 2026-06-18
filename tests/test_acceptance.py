@@ -227,6 +227,30 @@ def test_reference_has_emergent_headroom():
     assert len(set(vals)) >= 3, f"reference score looks templated, not emergent: {vals}"
 
 
+@pytest.mark.parametrize("seed", [42, 7, 123])
+def test_multihop_exposes_assembly_gap_with_headroom(seed):
+    """Multi-hop chains (2-3 hops, RNG length) surface the retrieval-vs-assembly
+    gap: the in-box backends retrieve the hops (recall > 0) but cannot assemble the
+    terminal answer (answer accuracy ~ 0) — honest headroom for a reasoning system."""
+    s = build_suite("v1", seed=seed)
+    for name in ("naive_rag", "temporal_rag"):
+        mh = run_eval(get_backend(name), s, k=10)["metrics"]["by_category"][MULTI_HOP]
+        assert mh["recall_at_k"] > 0.5, (name, mh["recall_at_k"])
+        assert mh["answer_accuracy"] < 0.5, (name, mh["answer_accuracy"])
+
+
+def test_multihop_chain_length_actually_varies():
+    """Chains must genuinely span 2 and 3 hops across the seed population — a
+    regression collapsing them to one fixed length must fail here."""
+    lengths = {
+        len(q.gold_support)
+        for seed in range(40, 60)
+        for sc in build_suite("v1", seed=seed).scenarios_for(MULTI_HOP)
+        for q in sc.queries
+    }
+    assert lengths == {2, 3}, lengths
+
+
 def test_discrimination_is_emergent_not_constant():
     """Discrimination must be a property of data+mechanism, not a designed
     constant: NaiveRAG's contradiction accuracy varies across seeds (it used to

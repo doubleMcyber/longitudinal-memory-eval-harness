@@ -32,7 +32,7 @@ from mem_eval.data.schema import (
     Suite,
 )
 
-DATASET_VERSION = "2026.9"
+DATASET_VERSION = "2026.10"
 
 
 @dataclass(frozen=True)
