@@ -53,9 +53,25 @@ production-ready — a planning pass surfaced credibility-gating gaps:
 The scoreboard is now genuinely multi-axis: **semantic_rag** wins retrieval, **temporal_rag** wins
 curation+contradiction (with headroom < 1.0), neither dominates — a real system must do all three.
 
+## Cycle 3 (DONE — external validity)
+- **D3 ✅**: a meaningfully-sized real-log corpus (`corpora/real_logs_v1/`: 8 hand-authored scenarios,
+  27 sessions, 9 queries, 3 annotators, κ ≈ 0.88) + an **external-validity study** (`mem_eval/validity/`,
+  `mem-eval validity`). A backend panel is ranked on the synthetic suite and on the real corpus by a
+  transparent quality composite; the harness reports **Spearman ρ** (headline), Kendall τ, and an exact
+  permutation p, with a per-axis decomposition. On the shipped data the rankings are **identical**
+  (temporal_rag wins both, no_memory floors both): **ρ = 1.0, τ = 1.0, p ≈ 0.017**, with positive transfer
+  on every axis (recall .92, precision .97, contradiction .79, answer 1.0). Rank-correlation primitives
+  (`mem_eval/metrics/correlation.py`: tie-averaged Spearman, Kendall τ-b, exact permutation p) are pure
+  stdlib + deterministic.
+
+  **Scope (honest):** the corpus is a *curated, hand-authored stand-in* for human-collected production
+  logs; the study is the reusable instrument and a genuine labeled corpus of the same format is a drop-in
+  replacement. The validity claim is bounded: to the extent real logs exercise these capabilities, the
+  synthetic ranking predicts the real one.
+
 ## Remaining (next cycle — adoption-scale, not credibility-gating)
-- **D3**: a meaningfully-sized labeled real-log suite + an external-validity study (Spearman correlation of
-  synthetic vs real rankings). The path/format/IAA already ship; this is a human-labeling research effort.
+- **D3-scale**: replace the curated stand-in corpus with a *genuinely human-collected*, large, IAA-vetted
+  real-log suite (the format/importer/study already ship; this is a data-collection + human-labeling effort).
 - **Planner item 7**: give multi_hop / recency_relevance the same RNG-stratified emergent treatment.
 - Hosted leaderboard + tamper-checked submission format (held-out seeds).
 
