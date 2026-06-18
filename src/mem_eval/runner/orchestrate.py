@@ -8,10 +8,12 @@ scorecard. The harness independently wall-clocks query latency (PRD §4.3.5).
 
 from __future__ import annotations
 
+import platform
 import subprocess
 from datetime import datetime
 from time import perf_counter
 
+from mem_eval import __version__ as HARNESS_VERSION
 from mem_eval.adapters.base import MemoryBackend, Usage
 from mem_eval.data.schema import Suite, superseded_as_of
 from mem_eval.grading.judge import DEFAULT_JUDGE, AnswerJudge
@@ -132,10 +134,13 @@ def run_eval(
     config = {"k": k, "consolidate_cadence": consolidate_cadence}
     env = {
         "git_sha": _git_sha(),
+        "harness_version": HARNESS_VERSION,
         "model": MODEL,
         "embedding_model": EMBEDDING_MODEL,
         "answer_judge": judge.name,
         "judge_model": getattr(judge, "model", None),
+        "python": platform.python_version(),
+        "platform": platform.platform(),
         "timestamp": timestamp or datetime.now().isoformat(timespec="seconds"),
     }
     return build_scorecard(

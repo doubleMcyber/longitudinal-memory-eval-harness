@@ -51,6 +51,22 @@ def _cmd_compare(args) -> int:
     return 0
 
 
+def _cmd_iaa(args) -> int:
+    from mem_eval.data.importers.transcript import transcript_candidate_refs
+    from mem_eval.grading.agreement import inter_annotator_agreement
+
+    with open(args.annotations) as fh:
+        multi = json.load(fh)
+    refs = transcript_candidate_refs(args.transcript)
+    result = inter_annotator_agreement(multi, refs)
+    print(f"support_kappa={result['support_kappa']:.3f} "
+          f"answer_agreement={result['answer_agreement']:.3f} "
+          f"annotators={result['n_annotators']}")
+    for pair, kv in result["pairwise_kappa"].items():
+        print(f"  {pair}: kappa={kv:.3f}")
+    return 0
+
+
 def _cmd_depth(args) -> int:
     depths = tuple(int(d) for d in args.depths.split(",")) if args.depths else DEFAULT_DEPTHS
     curve = depth_curve(args.backend, seed=args.seed, depths=depths, k=args.k)
@@ -119,6 +135,11 @@ def build_parser() -> argparse.ArgumentParser:
     d.add_argument("--k", type=int, default=DEFAULT_K)
     d.add_argument("--depths", default=None, help="comma-separated depths, e.g. 8,16,32,64")
     d.set_defaults(func=_cmd_depth)
+
+    a = sub.add_parser("iaa", help="inter-annotator agreement over a multi-annotator sidecar")
+    a.add_argument("--transcript", required=True)
+    a.add_argument("--annotations", required=True, help="multi-annotator JSON sidecar")
+    a.set_defaults(func=_cmd_iaa)
     return p
 
 
