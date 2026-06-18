@@ -1,0 +1,23 @@
+{
+  "note": "Two independent annotators over the sample transcript (PRD §9 IAA). They agree on the backup-email support but disagree on which turn supports the plant-reminder query, so support kappa is < 1 while answers agree.",
+  "annotators": [
+    {
+      "annotator_id": "ann1",
+      "queries": [
+        {"query_id": "q0", "gold_answer": "vault-keeper@proton.me",
+         "support": [{"session": "r-s0", "turn": "r-s0-t000"}]},
+        {"query_id": "q1", "gold_answer": "Fridays",
+         "support": [{"session": "r-s1", "turn": "r-s1-t000"}]}
+      ]
+    },
+    {
+      "annotator_id": "ann2",
+      "queries": [
+        {"query_id": "q0", "gold_answer": "vault-keeper@proton.me",
+         "support": [{"session": "r-s0", "turn": "r-s0-t000"}]},
+        {"query_id": "q1", "gold_answer": "Fridays",
+         "support": [{"session": "r-s1", "turn": "r-s1-t001"}]}
+      ]
+    }
+  ]
+}

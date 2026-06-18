@@ -97,6 +97,18 @@ def build_scenario_from_logs(
     )
 
 
+def transcript_candidate_refs(transcript_path: str) -> list[str]:
+    """All (session, turn) reference ids in a transcript — the candidate set over
+    which inter-annotator support agreement is measured (PRD §9)."""
+    sessions = import_sessions(_load_json(transcript_path)["sessions"])
+    return [f"{s.session_id}:{t.turn_id}" for s in sessions for t in s.turns]
+
+
+def _load_json(path: str) -> dict:
+    with open(path) as fh:
+        return json.load(fh)
+
+
 def propose_labels(transcript_path: str) -> dict:
     """LLM-assisted label proposal — STUB (PRD §9 tier b).
 
@@ -116,5 +128,6 @@ __all__ = [
     "import_sessions",
     "load_annotation",
     "build_scenario_from_logs",
+    "transcript_candidate_refs",
     "propose_labels",
 ]

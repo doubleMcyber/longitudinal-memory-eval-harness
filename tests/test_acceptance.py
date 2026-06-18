@@ -266,3 +266,16 @@ def test_a7_gate_shape(suite):
     assert len(CATEGORIES) == 5
     assert len(BASELINES) == 3
     assert len(SEVEN_METRIC_KEYS) == 7
+
+
+def test_reproducibility_manifest_present(suite):
+    """Every scorecard must carry a reproducibility manifest (PRD §10.3): backend
+    + dataset (incl. scale) + config + env (harness/python/platform/judge/models)
+    + determinism hash, so a run can be re-derived and fairly compared."""
+    sc = _run("naive_rag", suite)
+    assert set(sc) >= {"run_id", "backend", "dataset", "config", "metrics", "env", "determinism_hash"}
+    assert {"name", "version"} <= set(sc["backend"])
+    assert {"suite", "version", "seed", "scale"} <= set(sc["dataset"])
+    env = sc["env"]
+    assert {"harness_version", "python", "platform", "embedding_model", "answer_judge"} <= set(env)
+    assert sc["determinism_hash"]
