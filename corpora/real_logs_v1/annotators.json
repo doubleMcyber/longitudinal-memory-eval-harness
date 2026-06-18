@@ -1,0 +1,56 @@
+{
+  "note": "Three independent annotators labeling the real_logs_v1 corpus (PRD §9 IAA). All agree on gold answers; ann3 also counts the assistant confirmation as a supporting turn on rl-addr, and ann2 does the same on rl-email — defensible support disagreements that keep Cohen's kappa high but below 1.0, exactly the signal a serious benchmark surfaces before admitting hand-labeled gold.",
+  "annotators": [
+    {
+      "annotator_id": "ann1",
+      "labels": [
+        {"scenario_id": "rl-addr", "query_id": "rl-addr-q0", "gold_answer": "Madrid",
+         "support": [{"session": "addr-s2", "turn": "addr-s2-t0"}]},
+        {"scenario_id": "rl-plan", "query_id": "rl-plan-q0", "gold_answer": "Enterprise",
+         "support": [{"session": "plan-s1", "turn": "plan-s1-t0"}]},
+        {"scenario_id": "rl-reside", "query_id": "rl-reside-q0", "gold_answer": "Reykjavik",
+         "support": [{"session": "reside-s0", "turn": "reside-s0-t0"}]},
+        {"scenario_id": "rl-employer", "query_id": "rl-employer-q0", "gold_answer": "Orchard Systems",
+         "support": [{"session": "emp-s0", "turn": "emp-s0-t0"}]},
+        {"scenario_id": "rl-email", "query_id": "rl-email-q0", "gold_answer": "vault.keeper@protonmail.com",
+         "support": [{"session": "email-s0", "turn": "email-s0-t0"}]},
+        {"scenario_id": "rl-needle", "query_id": "rl-needle-q0", "gold_answer": "4417",
+         "support": [{"session": "needle-s0", "turn": "needle-s0-t0"}]}
+      ]
+    },
+    {
+      "annotator_id": "ann2",
+      "labels": [
+        {"scenario_id": "rl-addr", "query_id": "rl-addr-q0", "gold_answer": "Madrid",
+         "support": [{"session": "addr-s2", "turn": "addr-s2-t0"}]},
+        {"scenario_id": "rl-plan", "query_id": "rl-plan-q0", "gold_answer": "Enterprise",
+         "support": [{"session": "plan-s1", "turn": "plan-s1-t0"}]},
+        {"scenario_id": "rl-reside", "query_id": "rl-reside-q0", "gold_answer": "Reykjavik",
+         "support": [{"session": "reside-s0", "turn": "reside-s0-t0"}]},
+        {"scenario_id": "rl-employer", "query_id": "rl-employer-q0", "gold_answer": "Orchard Systems",
+         "support": [{"session": "emp-s0", "turn": "emp-s0-t0"}]},
+        {"scenario_id": "rl-email", "query_id": "rl-email-q0", "gold_answer": "vault.keeper@protonmail.com",
+         "support": [{"session": "email-s0", "turn": "email-s0-t0"}, {"session": "email-s0", "turn": "email-s0-t1"}]},
+        {"scenario_id": "rl-needle", "query_id": "rl-needle-q0", "gold_answer": "4417",
+         "support": [{"session": "needle-s0", "turn": "needle-s0-t0"}]}
+      ]
+    },
+    {
+      "annotator_id": "ann3",
+      "labels": [
+        {"scenario_id": "rl-addr", "query_id": "rl-addr-q0", "gold_answer": "Madrid",
+         "support": [{"session": "addr-s2", "turn": "addr-s2-t0"}, {"session": "addr-s2", "turn": "addr-s2-t1"}]},
+        {"scenario_id": "rl-plan", "query_id": "rl-plan-q0", "gold_answer": "Enterprise",
+         "support": [{"session": "plan-s1", "turn": "plan-s1-t0"}]},
+        {"scenario_id": "rl-reside", "query_id": "rl-reside-q0", "gold_answer": "Reykjavik",
+         "support": [{"session": "reside-s0", "turn": "reside-s0-t0"}]},
+        {"scenario_id": "rl-employer", "query_id": "rl-employer-q0", "gold_answer": "Orchard Systems",
+         "support": [{"session": "emp-s0", "turn": "emp-s0-t0"}]},
+        {"scenario_id": "rl-email", "query_id": "rl-email-q0", "gold_answer": "vault.keeper@protonmail.com",
+         "support": [{"session": "email-s0", "turn": "email-s0-t0"}]},
+        {"scenario_id": "rl-needle", "query_id": "rl-needle-q0", "gold_answer": "4417",
+         "support": [{"session": "needle-s0", "turn": "needle-s0-t0"}]}
+      ]
+    }
+  ]
+}
