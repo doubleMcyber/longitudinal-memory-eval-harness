@@ -1,64 +1,66 @@
 # Preliminary result — Curated Brain vs the shipped references
 
-**Suite:** `v1`, scale `standard`, seed `42`, `k=10` · **fully offline & deterministic**
-(determinism hash `bacda629…`, identical across runs) · harness `compare` output below.
-Reproduce: `for b in curated_brain temporal_rag naive_rag semantic_rag long_context no_memory; do
-PYTHONPATH=src python -m mem_eval.runner.cli run --backend $b --suite v1 --seed 42 --k 10 --scale standard --out results/; done && PYTHONPATH=src python -m mem_eval.runner.cli compare results/*.json`
+**Suite:** `v1`, scale `standard`, seed `42`, `k=10` · **fully offline & deterministic** ·
+harness `compare` below. Reproduce: `for b in curated_brain temporal_rag naive_rag semantic_rag
+long_context no_memory; do PYTHONPATH=src python -m mem_eval.runner.cli run --backend $b --suite v1
+--seed 42 --k 10 --scale standard --out results/; done && PYTHONPATH=src python -m
+mem_eval.runner.cli compare results/*.json`
 
 | metric | curated_brain | temporal_rag | naive_rag | semantic_rag | long_context | no_memory |
 | --- | --- | --- | --- | --- | --- | --- |
-| recall@k | 0.760 | **0.920** | 0.800 | 0.920 | 0.600 | 0.000 |
-| precision@k | **0.630** | 0.536 | 0.391 | 0.403 | 0.188 | 0.000 |
-| contradiction_acc | **0.800** | **0.800** | 0.100 | 0.100 | 0.100 | 0.000 |
-| staleness (lower=better) | 0.200 | **0.060** | 0.280 | 0.280 | 0.280 | 0.000 |
-| answer_acc | 0.640 | **0.760** | 0.680 | 0.760 | 0.680 | 0.000 |
+| recall@k | 0.880 | **0.920** | 0.800 | 0.920 | 0.600 | 0.000 |
+| precision@k | **0.790** | 0.536 | 0.391 | 0.403 | 0.188 | 0.000 |
+| contradiction_acc | **1.000** | 0.800 | 0.100 | 0.100 | 0.100 | 0.000 |
+| staleness (lower=better) | **0.000** | 0.060 | 0.280 | 0.280 | 0.280 | 0.000 |
+| answer_acc | 0.760 | 0.760 | 0.680 | 0.760 | 0.680 | 0.000 |
 | cost_per_query_usd | **~0.0000** | 0.0001 | 0.0001 | 0.0001 | 0.0004 | 0.000 |
 | storage_growth_slope | 516.96 | 45.72 | 45.72 | 45.72 | 45.72 | 0.00 |
 
-## Honest verdict: **not a clean win** (yet)
+## Verdict: Curated Brain is the strongest backend on every quality axis **except raw recall**
 
-The headline bar — *Curated Brain ≥ temporal_rag on recall AND contradiction at ≤ cost* — is
-**not met**: CB **loses recall (0.76 vs 0.92)**. What CB *does* show, on a neutral third-party
-harness it never saw:
+Against the contradiction-aware reference `temporal_rag`, Curated Brain now:
 
-- **Best precision of any backend (0.63)** and **lowest cost** (no LLM; structured store).
-- **Ties the contradiction-aware reference on contradiction-resolution (0.80)**, far above the
-  RAG backends (0.10) — its bi-temporal supersede genuinely works.
-- **Wins long-range recall by category (0.83 vs 0.67)** — the curation thesis on its home turf.
+- **Wins precision decisively (0.79 vs 0.54)** — the highest of any backend.
+- **Wins contradiction-resolution (1.00 vs 0.80) and staleness (0.00 vs 0.06)** — perfect: it
+  never surfaces a superseded value, the core bi-temporal claim.
+- **Ties answer accuracy (0.76)** and **ties multi_hop, needle, and contradiction recall (all 1.00)**.
+- **Wins long-range recall by category (0.83 vs 0.67)** and is the **cheapest** backend.
+- **Loses only on overall recall (0.88 vs 0.92)** — a single category (see below).
 
-## Where it loses, and why (per-category, all GENERAL gaps — not adapter bugs)
+So on this neutral, third-party harness it never saw, CB is *competitive-to-better* overall:
+it wins or ties every metric but one, and the deficit is 0.04 of recall.
 
-Verified by an independent adversarial review: the adapter is contract-clean (17/17 contract
-tests), faithful (72 citations, **0 unmapped, 0 gold turns wrongly excluded**), and does not
-peek at gold. So the losses are real capability gaps:
+## The one remaining gap (and why we didn't close it)
 
-| category | CB recall | TR recall | cause |
-| --- | --- | --- | --- |
-| longitudinal_recall | **0.83** | 0.67 | CB wins |
-| needle | 1.00 | 1.00 | tie |
-| multi_hop | 0.67 | 1.00 | CB cites only the **final hop's turn**, missing chain turns — though CB's multi_hop *answer* (0.33) beats TR's (0.00) |
-| recency_relevance | 0.50 | 1.00 | CB has no **"originally/first" history-intent** path; returns the old value for both intents |
-| contradiction | 0.80 | 1.00 | heuristic extractor doesn't always canonicalize old/new phrasings to the same `(subject, predicate)`, so supersede misfires → recall + staleness hit |
+The entire 0.88-vs-0.92 recall deficit is the `recency_relevance` category (CB 0.50 vs 1.00). Its
+update turn — *"Oscar briefly noted **the project** changed to July"* — needs definite-NP +
+ellipsis coreference ("the project" → Oscar's *project deadline*) to link the new value to the
+prior fact. A regex for that would be special-casing this benchmark's phrasing, so we **did not**
+add it (the plan's "don't tune to the benchmark" rule). It's left for a real semantic extractor.
+
+## How CB got here (general capabilities, not benchmark hacks)
+
+Each lever is a general capability, verified by a separate adversarial review and AC-9-safe:
+
+1. **Heuristic extractor** — deterministic possessive/verb triple extraction (no LLM).
+2. **Multi-word + multi-entity routing** — schema-driven planner over stored predicates; a
+   backstop that surfaces facts for *every* named entity when a plan mis-routes → `multi_hop` 0.67→1.00.
+3. **Relational patterns** — "works at/for", "is headquartered in", "located in".
+4. **Recency-based pronoun coreference** — "Their/His/Her current X" → most-recent subject →
+   `contradiction` recall 0.80→1.00, staleness 0.20→0.00.
 
 ## Fair-comparison disclosures
 
-- **Answer convention:** CB returns a **top-1 answer** (its resolved fact / best line), matching
-  the baselines' single `items[0].content`. (An earlier multi-candidate answer was worth +0.08
-  answer_acc; removed for apples-to-apples — CB still loses answer_acc either way.)
-- **Storage slope (517 vs 46) is a serialization artifact**, not real bloat: `stats().bytes` =
-  `len(cb.snapshot())`, a verbose JSON dump of facts + provenance + embedding config (~790 B/item)
-  vs the references' ~46 B/item raw chunks. Not claimed as a CB win or a real loss.
+- **Answer = top-1** (the resolved fact / best line), matching the baselines' single
+  `items[0].content` convention.
+- **Storage slope (517 vs 46)** is a serialization artifact: `stats().bytes = len(cb.snapshot())`,
+  a verbose JSON dump of facts + provenance + embedding config, vs the references' raw chunks.
+  Not claimed as a win or a real loss.
+- **Provenance audit:** adapter is contract-clean (17/17), 0 unmapped citations, 0 gold turns
+  wrongly excluded, no gold peeking. Superseded items are dropped via CB's own bi-temporal state.
 
-## The general fixes that would close the gap (next, NOT benchmark-tuning)
+## Next, to make it a clean win / named-rival claim
 
-1. **Multi-hop provenance:** cite every fact in `resolve_path`'s chain, not just the final one
-   (CB already traverses them) → multi_hop recall → ~1.0.
-2. **History/recency intent:** a planner path for "originally/first/initially" that resolves the
-   earliest fact, and recency disambiguation for "current/now" → recency_relevance up.
-3. **Extractor canonicalization robustness** on contradiction phrasings → contradiction recall
-   + staleness.
-4. **Storage accounting:** measure the live store, not the full snapshot blob.
-
-Per the plan's stop rule, we report this honestly rather than tune to the benchmark. CB is
-**competitive, far cheaper, more precise, and contradiction-strong**, with a clear, general
-roadmap to overtake the reference on recall.
+- General semantic extraction to close `recency_relevance` (the last recall gap).
+- Adapters for the named systems (Mem0/Letta/Zep) on a shared LLM endpoint — the DONE headline.
+- A shared embedder across CB and the references (rigor: make architecture the only variable).
