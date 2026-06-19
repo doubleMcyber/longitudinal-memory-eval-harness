@@ -41,13 +41,17 @@ INTEGRATIONS: dict[str, type] = {
     SemanticRAG.name: SemanticRAG,
 }
 
-# Documented stubs (interface-complete, raise NotImplementedError until wired).
-STUBS: dict[str, type] = {
-    Letta.name: Letta,
+# The system-under-test: Curated Brain, wired to the `curated-brain` package.
+SYSTEM: dict[str, type] = {
     CuratedBrain.name: CuratedBrain,
 }
 
-REGISTRY: dict[str, type] = {**BASELINES, **REFERENCES, **INTEGRATIONS, **STUBS}
+# Documented stubs (interface-complete, raise NotImplementedError until wired).
+STUBS: dict[str, type] = {
+    Letta.name: Letta,
+}
+
+REGISTRY: dict[str, type] = {**BASELINES, **REFERENCES, **INTEGRATIONS, **SYSTEM, **STUBS}
 
 
 def get_backend(name: str) -> MemoryBackend:
