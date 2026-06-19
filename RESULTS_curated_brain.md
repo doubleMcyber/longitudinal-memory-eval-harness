@@ -59,8 +59,38 @@ Each lever is a general capability, verified by a separate adversarial review an
 - **Provenance audit:** adapter is contract-clean (17/17), 0 unmapped citations, 0 gold turns
   wrongly excluded, no gold peeking. Superseded items are dropped via CB's own bi-temporal state.
 
+## Named-rival: Mem0 — preliminary OFFLINE result (n=3 subset)
+
+A first real head-to-head vs **Mem0** (`mem0ai` 2.0.7), run fully offline: Mem0 driven by a
+cached local model (`Qwen3.5-2B`) through a custom `LLMBase`, the **same** deterministic
+embedder as CB, in-memory qdrant. Mem0 is CPU-bound (~2.7 min/add), so this is the smallest
+scenario per key category (`contra-2`, `hop-1`, `long-0` — 15 turns, **3 queries**).
+Reproduce: `PYTHONPATH=src python bench_mem0_h2h.py` (adapter: `mem_eval/adapters/mem0_local.py`).
+
+| metric | curated_brain | temporal_rag | mem0 (Qwen-2B) |
+|---|---|---|---|
+| answer accuracy | **1.00** | 0.67 | 0.67 |
+| recall@k | 1.00 | 1.00 | 1.00 |
+| precision@k | **1.00** | 0.67 | 0.37 |
+| contradiction-resolution | **1.00** | 0.00 | 0.00 |
+| ingest wall-time (15 turns) | **~0 s** | ~0 s | **~70 min** |
+
+On this subset CB outperforms Mem0 on answer accuracy, precision, and contradiction; ties
+recall; at a fraction of the cost. **Honest caveats (do not over-read):**
+1. **n = 3 queries — anecdotal**, a feasibility data point, not a statistically meaningful claim.
+2. **Mem0 ran on a small local model** (Qwen-2B) via an OpenAI-shaped shim that drops the
+   `response_format`/role structure — this handicaps Mem0's JSON extraction vs its cloud-model
+   design. **This is NOT "CB beats Mem0 at its best."**
+3. **Different extractors** — CB used its heuristic (no LLM); not a same-model comparison.
+4. Mem0's additive-extraction path doesn't supersede contradictory values (only exact-dup
+   dedup), so its 0.00 contradiction is a real design difference, surfaced here.
+5. The harness `cost_per_query` excludes Mem0's heavy **ingest** (the ~70 min is the real cost gap).
+
+A *credible, full* named-rival run needs a capable shared model (an OpenAI-compatible endpoint
+makes Mem0 fast + fair); fairness of this adapter was confirmed by a separate adversarial review.
+
 ## Next, to make it a clean win / named-rival claim
 
-- General semantic extraction to close `recency_relevance` (the last recall gap).
-- Adapters for the named systems (Mem0/Letta/Zep) on a shared LLM endpoint — the DONE headline.
+- Run the full suite with a **capable shared endpoint** (CB + Mem0/Letta/Zep, same model) — the DONE headline.
+- General semantic extraction to close `recency_relevance` (the last recall gap vs references).
 - A shared embedder across CB and the references (rigor: make architecture the only variable).
