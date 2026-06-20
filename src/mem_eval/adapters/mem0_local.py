@@ -30,7 +30,7 @@ from mem_eval.pricing import price
 from mem_eval.text import count_tokens
 
 from curated_brain.fakes import DeterministicEmbedder
-from curated_brain.providers import TransformersLLM
+from curated_brain.providers import OpenAICompatLLM, TransformersLLM
 from mem0.embeddings.base import EmbeddingBase
 from mem0.llms.base import LLMBase
 
@@ -39,14 +39,24 @@ _EMB_DIM = 256
 # faster cached model (e.g. Qwen/Qwen3-0.6B) without code edits. Defaults preserve prior runs.
 _MODEL = os.environ.get("MEM0_MODEL", "Qwen/Qwen3.5-2B")
 _MAX_NEW_TOKENS = int(os.environ.get("MEM0_MAX_NEW_TOKENS", "256"))
+# When MEM0_OPENAI_BASE is set (e.g. a local Ollama/vLLM endpoint), drive mem0 through that
+# OpenAI-compatible endpoint instead of CPU-transformers — the same fast shared model every
+# system can use, which is what makes a full head-to-head tractable.
+_OPENAI_BASE = os.environ.get("MEM0_OPENAI_BASE", "")
+_OPENAI_MODEL = os.environ.get("MEM0_OPENAI_MODEL", "qwen2.5:3b")
 _SHARED_LLM = None  # load the local model once, reuse across scenario resets
 
 
-def _shared_llm() -> TransformersLLM:
+def _shared_llm():
     global _SHARED_LLM
     if _SHARED_LLM is None:
-        _SHARED_LLM = TransformersLLM(model_name=_MODEL, device="cpu",
-                                      max_new_tokens=_MAX_NEW_TOKENS)
+        if _OPENAI_BASE:
+            _SHARED_LLM = OpenAICompatLLM(_OPENAI_MODEL, base_url=_OPENAI_BASE,
+                                          api_key=os.environ.get("MEM0_OPENAI_KEY", "ollama"),
+                                          max_tokens=_MAX_NEW_TOKENS)
+        else:
+            _SHARED_LLM = TransformersLLM(model_name=_MODEL, device="cpu",
+                                          max_new_tokens=_MAX_NEW_TOKENS)
     return _SHARED_LLM
 
 

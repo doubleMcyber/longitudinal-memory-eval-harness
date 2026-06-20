@@ -149,6 +149,29 @@ clients pip-install), but **Zep additionally needs a Docker server (absent)** �
 locally cannot satisfy the "≥ each of Mem0/Letta/Zep" headline. The blocker is now *quantified*,
 not assumed: a capable shared inference endpoint is required.
 
+### Update — three "blocked" assumptions overturned, but local GPU inference hit a cascade of bugs
+
+Re-probing the environment (rather than assuming) corrected three earlier beliefs and produced
+endpoint-ready infrastructure — but a *working* local run was defeated by per-model technical bugs:
+
+- ✅ **Network egress exists** — `graphiti-core`, `kuzu`, `letta`, `llama-cpp-python` all pip-install.
+- ✅ **No-Docker Zep is possible** — Zep's own engine **Graphiti** runs in-process against an
+  **embedded Kuzu** graph DB (`KuzuDriver(db=":memory:")`). New adapter: `adapters/zep_graphiti.py`
+  (LLM→OpenAI-compatible endpoint; deterministic embedder + embedding-reranker for fairness).
+- ✅ **The MPS GPU works** (`torch.backends.mps` ok; 25 GiB) — earlier "MPS broken" was stale.
+- ❌ **But no local model would actually serve fast+sane**, after a fair sweep:
+  - Ollama (`brew install ollama` works) — but the **registry download stalls** (that CDN blocked);
+    partial blobs stuck at 58 B.
+  - **Ministral-8B on MPS crashes** — Metal `mps.matmul` GQA bug (`1x32` vs `1x8` head dims).
+  - **Qwen3 on MPS in bf16 is <2 tok/s** (Metal's slow path) → 256-tok calls time out.
+  - **fp16 on MPS hangs** during `.to("mps")` load (never serves).
+  - **CPU** is the ~5–11 h/system wall already measured above.
+
+Net: built `tools/mps_openai_server.py` (a shared OpenAI-compatible local endpoint) and the Zep
+adapter, and wired Mem0 to an endpoint (`MEM0_OPENAI_BASE`) — **all endpoint-ready but not yet
+validated end-to-end**, because this box has no working fast local model. Pointing any **hosted**
+OpenAI-compatible endpoint at them (set `MEM0_OPENAI_BASE`/`ZEP_OPENAI_BASE`) unblocks the run.
+
 ## Next, to make it a clean win / named-rival claim
 
 - Run the full suite with a **capable shared endpoint** (CB + Mem0/Letta/Zep, same model) — the DONE headline.
