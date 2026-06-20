@@ -59,6 +59,22 @@ Each lever is a general capability, verified by a separate adversarial review an
 - **Provenance audit:** adapter is contract-clean (17/17), 0 unmapped citations, 0 gold turns
   wrongly excluded, no gold peeking. Superseded items are dropped via CB's own bi-temporal state.
 
+## Real embedder (bge) — fixes paraphrase, but trades aggregate recall (honest)
+
+CB can run on a real semantic embedder (`BAAI/bge-small-en-v1.5`, offline) via `CB_EMBEDDER=bge`.
+It **fixes the paraphrase/lexical-gap category** the deterministic test-double can't:
+
+| lexgap-0 (paraphrase) | answer | recall | precision |
+|---|---|---|---|
+| CB + deterministic | 0.00 | 0.00 | 0.00 |
+| **CB + bge** | **1.00** | **1.00** | **1.00** |
+
+But on the **full standard suite** bge is a *tradeoff*, not a free win — semantic spread displaces
+some lexically-clean gold, so aggregate **recall drops 0.88 → 0.84** even as **precision rises
+0.79 → 0.84** (contradiction 1.00, answer 0.76 unchanged). So a real embedder is the right tool
+for paraphrase-heavy data but does not, by itself, close CB's headline recall gap on this suite.
+(The harness references keep their own offline embedders; a fully fair run would give them bge too.)
+
 ## Named-rival: Mem0 — preliminary OFFLINE result (n=3 subset)
 
 A first real head-to-head vs **Mem0** (`mem0ai` 2.0.7), run fully offline: Mem0 driven by a

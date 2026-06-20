@@ -39,6 +39,18 @@ from curated_brain import HeuristicExtractor
 # instant — enough to identify the turn, far too small (ms) to cross a query's as_of (which
 # the suite places days later), so session-level time-discipline is preserved.
 _TURN_DELTA = 1e-3
+_BGE = None  # cached real embedder, loaded once when CB_EMBEDDER=bge
+
+
+def _bge_embedder():
+    """Real semantic embedder (bge-small) — loaded once. Used when env CB_EMBEDDER=bge so the
+    paraphrase/lexical-gap category isn't bottlenecked by the deterministic test-double embedder."""
+    global _BGE
+    if _BGE is None:
+        from curated_brain.providers import SentenceTransformerEmbedder
+        _BGE = SentenceTransformerEmbedder("BAAI/bge-small-en-v1.5")
+        _BGE.embed("warmup")  # force lazy load now
+    return _BGE
 
 
 class CuratedBrain(BaseBackend):
@@ -49,7 +61,12 @@ class CuratedBrain(BaseBackend):
         self.reset()
 
     def reset(self) -> None:
-        self._cb = _CuratedBrain(extractor=HeuristicExtractor())
+        import os
+        if os.environ.get("CB_EMBEDDER") == "bge":
+            emb = _bge_embedder()
+            self._cb = _CuratedBrain(embedder=emb, dim=emb.dim, extractor=HeuristicExtractor())
+        else:
+            self._cb = _CuratedBrain(extractor=HeuristicExtractor())
         self._turn_of_ts: dict[float, tuple[str, str]] = {}      # fact provenance wall_ts -> turn
         self._turn_of_episode: dict[str, tuple[str, str]] = {}   # episodic rid -> turn
         self._turn_meta: dict[tuple[str, str], tuple[str, datetime]] = {}  # turn -> (text, ts)
