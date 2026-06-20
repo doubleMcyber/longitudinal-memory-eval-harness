@@ -185,10 +185,12 @@ endpoint-ready infrastructure — but a *working* local run was defeated by per-
   extractor parses, so it stores no usable memory — **a weak-model strawman, not a real Mem0**, and
   ~52 min for one scenario. A *fair* Mem0 needs a capable (JSON-compliant) model.
 
-  Final door closed: **Ministral-8B (a capable, JSON-compliant 8B) hard-crashes even with
-  fp16+eager** (no output, process dies during load/gen) — eager rescues the 1.7B but not the 8B
-  on this Metal stack. So the runnable set is ≤1.7B (too weak for Mem0's JSON) and every capable
-  model crashes or can't download. There is **no runnable capable model on this box**.
+  Final characterization (corrected): **Ministral-8B (capable, JSON-compliant) DOES run with
+  fp16+eager and emits perfect JSON** — `[{"subject":"Erin","predicate":"lives in","object":
+  "Vienna"}, …]`, exactly what Mem0 needs — but at **0.03 tok/s** (50 tokens in **25 min**), i.e.
+  ~150× too slow to complete even one scenario (days each). So the bind is a clean tradeoff with no
+  middle: the only *fast-enough* model (Qwen3-1.7B, 4.5 tok/s) is too weak for Mem0's JSON, and the
+  only *capable* model (Ministral-8B, perfect JSON) is ~150× too slow. No model on this box is both.
 
   **Conclusion (now proven end-to-end, not projected):** local capable-model inference is
   non-viable on this box — capable models crash (MPS GQA) or can't download (LFS/registry/raw all
