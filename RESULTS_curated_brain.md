@@ -185,6 +185,11 @@ endpoint-ready infrastructure — but a *working* local run was defeated by per-
   extractor parses, so it stores no usable memory — **a weak-model strawman, not a real Mem0**, and
   ~52 min for one scenario. A *fair* Mem0 needs a capable (JSON-compliant) model.
 
+  Final door closed: **Ministral-8B (a capable, JSON-compliant 8B) hard-crashes even with
+  fp16+eager** (no output, process dies during load/gen) — eager rescues the 1.7B but not the 8B
+  on this Metal stack. So the runnable set is ≤1.7B (too weak for Mem0's JSON) and every capable
+  model crashes or can't download. There is **no runnable capable model on this box**.
+
   **Conclusion (now proven end-to-end, not projected):** local capable-model inference is
   non-viable on this box — capable models crash (MPS GQA) or can't download (LFS/registry/raw all
   blocked), and the only runnable model (≤1.7B, fp16-eager) is too weak+slow to be a fair rival.
