@@ -75,19 +75,33 @@ Reproduce: `PYTHONPATH=src python bench_mem0_h2h.py` (adapter: `mem_eval/adapter
 | contradiction-resolution | **1.00** | 0.00 | 0.00 |
 | ingest wall-time (15 turns) | **~0 s** | ~0 s | **~70 min** |
 
-On this subset CB outperforms Mem0 on answer accuracy, precision, and contradiction; ties
-recall; at a fraction of the cost. **Honest caveats (do not over-read):**
-1. **n = 3 queries — anecdotal**, a feasibility data point, not a statistically meaningful claim.
-2. **Mem0 ran on a small local model** (Qwen-2B) via an OpenAI-shaped shim that drops the
-   `response_format`/role structure — this handicaps Mem0's JSON extraction vs its cloud-model
-   design. **This is NOT "CB beats Mem0 at its best."**
-3. **Different extractors** — CB used its heuristic (no LLM); not a same-model comparison.
-4. Mem0's additive-extraction path doesn't supersede contradictory values (only exact-dup
-   dedup), so its 0.00 contradiction is a real design difference, surfaced here.
-5. The harness `cost_per_query` excludes Mem0's heavy **ingest** (the ~70 min is the real cost gap).
+### Important correction — this subset is CB-FAVORABLE; the broader picture is narrower
 
-A *credible, full* named-rival run needs a capable shared model (an OpenAI-compatible endpoint
-makes Mem0 fast + fair); fairness of this adapter was confirmed by a separate adversarial review.
+The subset above is the *smallest scenario per category*, which happened to be CB's strong
+categories. A broader (partial) run over additional scenarios (`long-0`, `long-1`, `lexgap-0`)
+was attempted but the **full suite is infeasible offline** — Mem0 is ~2 h per large scenario on
+CPU (~15–20 h total), so it was killed after 3 more scenarios. What those scenarios show changes
+the story, honestly:
+
+| scenario | answer (CB/TR/Mem0) | precision (CB/TR/Mem0) |
+|---|---|---|
+| long-0 / long-1 (plain recall) | 1.00 / 1.00 / 1.00 *(all tie)* | **1.00** / 0.50 / ~0.13 |
+| lexgap-0 (paraphrase) | 0.00 / 0.00 / 0.00 *(all fail)* | 0.00 / 0.00 / 0.00 |
+
+**Honest synthesis across all scenarios actually run (contra-2, hop-1, long-0/1, lexgap-0):**
+- **CB dominates precision** everywhere (≈1.00 vs Mem0 ≈0.1–0.4) — it returns clean minimal facts;
+  Mem0 returns a noisy distilled set.
+- **CB wins contradiction** (1.00 vs 0.00) — Mem0's additive extraction doesn't supersede.
+- **Answer accuracy: CB ties** Mem0/temporal on plain longitudinal recall; the "1.00 vs 0.67
+  sweep" above was the favorable subset, **not** a general result.
+- **Paraphrase (lexgap) fails for ALL three** — a shared limitation of the offline (non-semantic)
+  embedders, **not** a CB-specific weakness.
+
+**Caveats (do not over-read):** n is tiny; Mem0 ran on a small local model via an OpenAI-shaped
+shim (frequent JSON-parse errors observed → **not Mem0 at its cloud best**); different extractors
+(CB heuristic vs Mem0 LLM); `cost_per_query` excludes Mem0's heavy ingest (the ~70 min is the real
+cost gap). Adapter fairness was confirmed by a separate adversarial review (which fixed a `top_k`
+defect first). A *credible, full* run needs a capable shared model + a real semantic embedder.
 
 ## Next, to make it a clean win / named-rival claim
 
