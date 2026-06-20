@@ -167,12 +167,29 @@ endpoint-ready infrastructure — but a *working* local run was defeated by per-
     (`1x32`/`1x8` heads) **and** Qwen3-1.7B (`1x16`/`1x8`) on the default SDPA path. When it
     doesn't crash, bf16-on-MPS runs <2 tok/s (Metal's slow path) and fp16+SDPA `.to("mps")` hangs.
   - **fp16 + `attn_implementation="eager"` is the ONLY config that runs** (avoids the fused GQA
-    matmul) — ~4.5 tok/s, sane output for a *single* call — **but SIGSEGVs (exit 139) under the
-    sustained load of a real run** (longer prompts / many calls). So a benchmark against it yields
-    a Connection-refused 0.0 strawman, not a valid Mem0 result. **Local capable-model inference is
-    conclusively non-viable on this box** across every avenue tried (CPU too slow; MPS SDPA crash /
-    bf16 slow / fp16 hang; fp16-eager segfaults under load; Ollama-registry + HF-LFS + GitHub-raw
-    all block/truncate large transfers). A hosted OpenAI-compatible endpoint is required.
+    matmul) — ~4.5 tok/s. The first segfault-under-load was **fixed** by serializing generation
+    with a lock (concurrent MPS `generate()` is not thread-safe). With that, a full end-to-end run
+    completed — and proves the deeper point:
+
+  **End-to-end run (stable inference, shared Qwen3-1.7B, 3 scenarios, 2026-06-20):**
+
+  | scenario | CB ans / prec | temporal_rag ans / prec | **mem0 ans** | mem0 wall |
+  |---|---|---|---|---|
+  | long-0 (recall) | 1.0 / 1.0 | 1.0 / 0.5 | **0.0** | 722 s |
+  | contra-0 (contradiction) | 1.0 / 1.0 | — | **0.0** | **3125 s (52 min)** |
+  | hop-0 (multi-hop) | 0.0 / 1.0 | — | **0.0** (extraction timeouts) | 1082 s |
+  | **aggregate** | **0.67 / 1.00** | 0.67 / **0.53** | **0.00 / 0.00** | — |
+
+  Mem0's calls *succeeded* (no infra error on long-0/contra-0) yet it scored **0.0 everywhere**:
+  Qwen3-1.7B returns markdown prose ("Here are the **triples**…"), not the strict JSON Mem0's
+  extractor parses, so it stores no usable memory — **a weak-model strawman, not a real Mem0**, and
+  ~52 min for one scenario. A *fair* Mem0 needs a capable (JSON-compliant) model.
+
+  **Conclusion (now proven end-to-end, not projected):** local capable-model inference is
+  non-viable on this box — capable models crash (MPS GQA) or can't download (LFS/registry/raw all
+  blocked), and the only runnable model (≤1.7B, fp16-eager) is too weak+slow to be a fair rival.
+  A hosted OpenAI-compatible endpoint is required; the adapters (`MEM0_OPENAI_BASE`/`ZEP_OPENAI_BASE`,
+  CB `OpenAICompatLLM`) target it directly. CB-vs-references above is unaffected and reproducible.
   - **CPU** is the ~5–11 h/system wall already measured above.
 
 Net: built `tools/mps_openai_server.py` (a shared OpenAI-compatible local endpoint) and the Zep

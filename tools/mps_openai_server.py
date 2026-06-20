@@ -18,8 +18,13 @@ import argparse
 import json
 import os
 import re
+import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+# MPS generation is NOT thread-safe: two concurrent model.generate() calls on the same Metal
+# model SIGSEGV. Mem0/graphiti issue several LLM calls per add, so serialize all generation.
+_GEN_LOCK = threading.Lock()
 
 from curated_brain.fakes import DeterministicEmbedder
 
@@ -78,7 +83,7 @@ def _generate(messages: list[dict]) -> str:
     except TypeError:  # template doesn't support enable_thinking (non-reasoning model)
         text = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
     inputs = tok(text, return_tensors="pt").to(_DEVICE)
-    with torch.no_grad():
+    with _GEN_LOCK, torch.no_grad():  # serialize: concurrent MPS generate() segfaults
         out = model.generate(**inputs, max_new_tokens=_MAX_NEW, do_sample=False, num_beams=1,
                              pad_token_id=tok.eos_token_id)
     gen = out[0][inputs["input_ids"].shape[1]:]
