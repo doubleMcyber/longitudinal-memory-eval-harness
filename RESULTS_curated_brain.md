@@ -222,6 +222,29 @@ adapter, and wired Mem0 to an endpoint (`MEM0_OPENAI_BASE`) — **all endpoint-r
 validated end-to-end**, because this box has no working fast local model. Pointing any **hosted**
 OpenAI-compatible endpoint at them (set `MEM0_OPENAI_BASE`/`ZEP_OPENAI_BASE`) unblocks the run.
 
+## Forced-JSON breakthrough (2026-06-20) — Mem0 made functional on the fast model, but throughput-capped
+
+The fast 1.7B failed earlier only because it emits prose, not JSON. Grammar-constrained decoding
+(`outlines`, `MEM0_OUTLINES=1`) fixes that: it forces Qwen3-1.7B to emit mem0's **exact** schemas
+(`{"facts":[str]}` for extraction, `{"memory":[…]}` for update, picked from the prompt). Result on
+the smallest scenario (`contra-2`, 2 turns, **same 1.7B model** for CB and mem0):
+
+| | answer | recall@k | precision@k | contradiction |
+|---|---|---|---|---|
+| curated_brain | 1.00 | 1.00 | 1.00 | 1.00 |
+| **mem0 (forced-JSON 1.7B)** | **1.00** | 0.00* | 0.00* | 0.00* |
+
+- **mem0 is now FUNCTIONAL** — `answer_accuracy=1.00` (no longer the 0.0 prose strawman). The
+  forced-JSON path genuinely works; mem0 extracts, stores, and answers correctly on the fast model.
+- **\*recall/precision 0.00 is an adapter provenance artifact, NOT a fair mem0 loss** — mem0
+  answered *correctly*, so it has the info; the harness scores recall/precision by `(source_session,
+  source_turn)` and the adapter doesn't surface gold-turn provenance for mem0's (consolidated)
+  memories. So the honest n=1 reading is an **answer-accuracy tie**, not a CB recall/precision win.
+- **Throughput cap:** outlines' FSM-constrained decoding is slow — **1711 s (28 min) for one 2-turn
+  scenario**. A meaningful multi-scenario × multi-rival run is infeasible at this rate. So even this
+  working path doesn't yield a clean, scalable, fair clause-1 result; a hosted endpoint remains the
+  way. The integration (`MEM0_OUTLINES=1`) is committed and reusable.
+
 ## Next, to make it a clean win / named-rival claim
 
 - Run the full suite with a **capable shared endpoint** (CB + Mem0/Letta/Zep, same model) — the DONE headline.
