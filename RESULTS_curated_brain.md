@@ -192,6 +192,13 @@ endpoint-ready infrastructure — but a *working* local run was defeated by per-
   middle: the only *fast-enough* model (Qwen3-1.7B, 4.5 tok/s) is too weak for Mem0's JSON, and the
   only *capable* model (Ministral-8B, perfect JSON) is ~150× too slow. No model on this box is both.
 
+  Quantization (the fix for the paging) is also blocked: root cause confirmed — 16 GB fp16 weights
+  page on this **32 GB / ~14.7 GB-free** box (hence 0.03 tok/s). int8 (~8 GB) would fit, but both
+  quantizers fail on dependency incompatibilities — `optimum-quanto` errors on `PreTrainedModel`
+  import, and installing `torchao` bumped transformers to **5.12.1**, which **dropped Ministral
+  support** (`MinistralForCausalLM` gone), so the capable model can no longer even load to be
+  quantized. (CB's offline gate is unaffected — it uses the deterministic fakes, stays green.)
+
   **Conclusion (now proven end-to-end, not projected):** local capable-model inference is
   non-viable on this box — capable models crash (MPS GQA) or can't download (LFS/registry/raw all
   blocked), and the only runnable model (≤1.7B, fp16-eager) is too weak+slow to be a fair rival.
