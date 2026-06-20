@@ -192,6 +192,14 @@ endpoint-ready infrastructure — but a *working* local run was defeated by per-
   middle: the only *fast-enough* model (Qwen3-1.7B, 4.5 tok/s) is too weak for Mem0's JSON, and the
   only *capable* model (Ministral-8B, perfect JSON) is ~150× too slow. No model on this box is both.
 
+  **int8 finally measured (decisive):** after removing the broken torchvision (the `nms`-op root),
+  torchao int8 quantization *works* — Ministral fits (~8 GB), no paging — but runs at **1.22 tok/s**
+  on MPS (~40× faster than fp16's paging-bound 0.03, confirming the memory diagnosis, yet still far
+  below usable: MPS has no optimized int8 kernels, so it dequantizes per matmul). Also, loading
+  Ministral via `MistralForCausalLM` (to dodge the missing `MinistralForCausalLM` class) breaks its
+  alternating-attention → empty output. So even the int8 fix yields neither usable speed nor a
+  correct model here. The capable model is unrunnable at usable speed on this box, period.
+
   Quantization (the fix for the paging) is also blocked: root cause confirmed — 16 GB fp16 weights
   page on this **32 GB / ~14.7 GB-free** box (hence 0.03 tok/s). int8 (~8 GB) would fit, but the
   quantizer toolchain is a dependency tarpit: `optimum-quanto` errors on `PreTrainedModel`;
