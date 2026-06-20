@@ -162,9 +162,11 @@ endpoint-ready infrastructure — but a *working* local run was defeated by per-
 - ❌ **But no local model would actually serve fast+sane**, after a fair sweep:
   - Ollama (`brew install ollama` works) — but the **registry download stalls** (that CDN blocked);
     partial blobs stuck at 58 B.
-  - **Ministral-8B on MPS crashes** — Metal `mps.matmul` GQA bug (`1x32` vs `1x8` head dims).
-  - **Qwen3 on MPS in bf16 is <2 tok/s** (Metal's slow path) → 256-tok calls time out.
-  - **fp16 on MPS hangs** during `.to("mps")` load (never serves).
+  - **MPS is a dead end for modern GQA models** — Metal's `mps.matmul` throws
+    `incompatible dimensions` on grouped-query-attention shapes, crashing **both** Ministral-8B
+    (`1x32`/`1x8` heads) **and** Qwen3-1.7B (`1x16`/`1x8`). When it doesn't crash, bf16-on-MPS
+    runs <2 tok/s (Metal's slow path) and fp16 `.to("mps")` hangs on load. So the GPU is unusable
+    for these models without patching torch/Metal — go straight to a hosted endpoint or quantized CPU.
   - **CPU** is the ~5–11 h/system wall already measured above.
 
 Net: built `tools/mps_openai_server.py` (a shared OpenAI-compatible local endpoint) and the Zep
