@@ -42,9 +42,14 @@ def _llm_once():
     if _model is None:
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
+        # MPS needs fp16 (bf16 is <2 tok/s) AND eager attention (the fused SDPA path hits a
+        # Metal grouped-query-attention matmul crash; fp16+SDPA also hangs on load). Eager is
+        # slower (~4-5 tok/s) but is the only config that loads and runs without crashing here.
         dtype = torch.float16 if _DEVICE == "mps" else "auto"
+        attn = "eager" if _DEVICE == "mps" else None
         _tokenizer = AutoTokenizer.from_pretrained(_MODEL)
-        _model = AutoModelForCausalLM.from_pretrained(_MODEL, torch_dtype=dtype).to(_DEVICE)
+        _model = AutoModelForCausalLM.from_pretrained(
+            _MODEL, dtype=dtype, attn_implementation=attn).to(_DEVICE)
     return _tokenizer, _model
 
 

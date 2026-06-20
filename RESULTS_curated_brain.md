@@ -164,9 +164,15 @@ endpoint-ready infrastructure — but a *working* local run was defeated by per-
     partial blobs stuck at 58 B.
   - **MPS is a dead end for modern GQA models** — Metal's `mps.matmul` throws
     `incompatible dimensions` on grouped-query-attention shapes, crashing **both** Ministral-8B
-    (`1x32`/`1x8` heads) **and** Qwen3-1.7B (`1x16`/`1x8`). When it doesn't crash, bf16-on-MPS
-    runs <2 tok/s (Metal's slow path) and fp16 `.to("mps")` hangs on load. So the GPU is unusable
-    for these models without patching torch/Metal — go straight to a hosted endpoint or quantized CPU.
+    (`1x32`/`1x8` heads) **and** Qwen3-1.7B (`1x16`/`1x8`) on the default SDPA path. When it
+    doesn't crash, bf16-on-MPS runs <2 tok/s (Metal's slow path) and fp16+SDPA `.to("mps")` hangs.
+  - **fp16 + `attn_implementation="eager"` is the ONLY config that runs** (avoids the fused GQA
+    matmul) — ~4.5 tok/s, sane output for a *single* call — **but SIGSEGVs (exit 139) under the
+    sustained load of a real run** (longer prompts / many calls). So a benchmark against it yields
+    a Connection-refused 0.0 strawman, not a valid Mem0 result. **Local capable-model inference is
+    conclusively non-viable on this box** across every avenue tried (CPU too slow; MPS SDPA crash /
+    bf16 slow / fp16 hang; fp16-eager segfaults under load; Ollama-registry + HF-LFS + GitHub-raw
+    all block/truncate large transfers). A hosted OpenAI-compatible endpoint is required.
   - **CPU** is the ~5–11 h/system wall already measured above.
 
 Net: built `tools/mps_openai_server.py` (a shared OpenAI-compatible local endpoint) and the Zep
