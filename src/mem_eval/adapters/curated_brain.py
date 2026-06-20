@@ -89,15 +89,17 @@ class CuratedBrain(BaseBackend):
         return Usage()
 
     def query(self, prompt: str, k: int, as_of: datetime) -> QueryResult:
+        # Supersede-filtering of multi-word stale values now lives in CB CORE
+        # (`_stale_token_sets`/`fuse`), so the citations CB returns are already stale-free —
+        # no adapter-side workaround needed (staleness=0.00 is a genuine core property).
         as_of_ts = as_of.timestamp()
         r = self._cb.query(prompt, session_id="__q__", timestamp=as_of_ts, k=k)
-        stale = self._superseded_turns(as_of_ts)
 
         items: list[MemoryItem] = []
         seen: set[tuple[str, str]] = set()
         for cit in r.citations:
             origin = self._origin(cit)
-            if origin is None or origin in seen or origin in stale:
+            if origin is None or origin in seen:
                 continue
             seen.add(origin)
             text, ts = self._turn_meta[origin]
@@ -135,18 +137,6 @@ class CuratedBrain(BaseBackend):
             return o
         ts = citation.provenance.get("wall_ts")
         return self._turn_of_ts.get(ts) if ts is not None else None
-
-    def _superseded_turns(self, as_of_ts: float) -> set[tuple[str, str]]:
-        """Turns whose asserted fact was closed (superseded) by ``as_of`` — CB's own
-        bi-temporal record, NOT gold. Used to drop stale items the token-based vector filter
-        misses for multi-word values, so a superseded statement never counts as retrieved."""
-        out: set[tuple[str, str]] = set()
-        for f in self._cb.structured.facts:
-            if f.valid_to <= as_of_ts:  # no longer valid at query time
-                turn = self._turn_of_ts.get(f.provenance.get("wall_ts"))
-                if turn is not None:
-                    out.add(turn)
-        return out
 
 
 __all__ = ["CuratedBrain"]
