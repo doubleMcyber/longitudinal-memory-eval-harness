@@ -129,6 +129,26 @@ shim (frequent JSON-parse errors observed → **not Mem0 at its cloud best**); d
 cost gap). Adapter fairness was confirmed by a separate adversarial review (which fixed a `top_k`
 defect first). A *credible, full* run needs a capable shared model + a real semantic embedder.
 
+## Measured feasibility of a full local run (2026-06-20) — why a faster small model is NOT a shortcut
+
+The obvious idea — swap in a tiny faster model to make the full suite tractable — was **measured
+and rejected**. With `MEM0_MODEL=Qwen/Qwen3-0.6B` (+ `/no_think` to suppress reasoning verbosity)
+on one 2-turn scenario:
+
+- **Throughput:** ~350 s/add (mem0 issues *many* LLM calls per add — extract + per-memory compare +
+  update decision — not ~2), projecting to **~11.5 h** for the 118-add `small` suite — *worse* than
+  the 2B model, because the small model's per-token speed gain is swamped by call count.
+- **Quality:** Mem0 scored **answer 0.00 / contradiction 0.00** — the 0.6B model is too weak to
+  extract usable memories, so a run against it would be an **unfair strawman**, not a real rival.
+
+So the local-CPU envelope is a genuine bind: the only models fast enough are too weak to be a fair
+Mem0, and a *fair* model (≥2B) is ~5 h for Mem0 **alone**. The `MEM0_MODEL` / `MEM0_MAX_NEW_TOKENS`
+/ `MEM0_NO_THINK` env knobs were added so the eventual **hosted-endpoint** run is a one-liner, but
+they do **not** make a credible full local run feasible. Network egress IS available here (so the
+clients pip-install), but **Zep additionally needs a Docker server (absent)** — so even Mem0+Letta
+locally cannot satisfy the "≥ each of Mem0/Letta/Zep" headline. The blocker is now *quantified*,
+not assumed: a capable shared inference endpoint is required.
+
 ## Next, to make it a clean win / named-rival claim
 
 - Run the full suite with a **capable shared endpoint** (CB + Mem0/Letta/Zep, same model) — the DONE headline.

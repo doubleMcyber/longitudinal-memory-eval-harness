@@ -14,6 +14,8 @@ Caveats (reported honestly, not hidden):
 
 from __future__ import annotations
 
+import os
+import re
 from datetime import datetime
 
 from mem_eval.adapters.base import (
@@ -33,15 +35,28 @@ from mem0.embeddings.base import EmbeddingBase
 from mem0.llms.base import LLMBase
 
 _EMB_DIM = 256
-_MODEL = "Qwen/Qwen3.5-2B"
+# Local model + decode budget are overridable so a full-suite offline run can pick a smaller/
+# faster cached model (e.g. Qwen/Qwen3-0.6B) without code edits. Defaults preserve prior runs.
+_MODEL = os.environ.get("MEM0_MODEL", "Qwen/Qwen3.5-2B")
+_MAX_NEW_TOKENS = int(os.environ.get("MEM0_MAX_NEW_TOKENS", "256"))
 _SHARED_LLM = None  # load the local model once, reuse across scenario resets
 
 
 def _shared_llm() -> TransformersLLM:
     global _SHARED_LLM
     if _SHARED_LLM is None:
-        _SHARED_LLM = TransformersLLM(model_name=_MODEL, device="cpu", max_new_tokens=256)
+        _SHARED_LLM = TransformersLLM(model_name=_MODEL, device="cpu",
+                                      max_new_tokens=_MAX_NEW_TOKENS)
     return _SHARED_LLM
+
+
+_THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL)
+# Qwen3 family are reasoning models: their verbose <think> blocks are slow and break mem0's
+# JSON/triple parsing. The "/no_think" soft switch disables reasoning; the regex strips any
+# residual block. Off by default (preserves the documented n=3 reproduction); opt in with
+# MEM0_NO_THINK=1. Measured caveat: even with it, a <=0.6B model is too weak to be a fair
+# rival (answer_acc 0.0) AND mem0's many-calls-per-add makes a full run ~11h — see RESULTS.
+_NO_THINK = os.environ.get("MEM0_NO_THINK", "0") == "1"
 
 
 class _Mem0LocalLLM(LLMBase):
@@ -50,7 +65,10 @@ class _Mem0LocalLLM(LLMBase):
 
     def generate_response(self, messages, tools=None, tool_choice="auto", **kwargs):
         prompt = "\n\n".join(m.get("content", "") for m in messages)
-        return self.llm.complete(prompt)
+        if _NO_THINK:
+            prompt += " /no_think"
+        out = self.llm.complete(prompt)
+        return _THINK_RE.sub("", out).strip() if _NO_THINK else out
 
 
 class _Mem0DetEmbedding(EmbeddingBase):
