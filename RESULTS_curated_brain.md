@@ -75,6 +75,16 @@ some lexically-clean gold, so aggregate **recall drops 0.88 → 0.84** even as *
 for paraphrase-heavy data but does not, by itself, close CB's headline recall gap on this suite.
 (The harness references keep their own offline embedders; a fully fair run would give them bge too.)
 
+**Hybrid retrieval (added):** CB's `VectorTier.search` now fuses embedding similarity with lexical
+token-overlap. This **fixes bge's paraphrase regression** — with hybrid, the
+`longitudinal_recall`/lexgap category recovers to **1.00** (semantic finds the paraphrase, lexical
+keeps the exact mentions), and contradiction/multi_hop stay 1.00. But aggregate bge recall stays
+**0.84**: the remaining loss is the **`needle`** category (0.00), which is a *surprise-gate/storage*
+interaction — under bge's novelty distribution the needle observation is gated differently — **not**
+a retrieval-ranking issue, so hybrid (a ranking change) cannot fix it. Honest: hybrid is a real,
+general, AC-safe improvement that makes the real embedder viable; it does **not** move the headline
+recall number.
+
 ## Named-rival: Mem0 — preliminary OFFLINE result (n=3 subset)
 
 A first real head-to-head vs **Mem0** (`mem0ai` 2.0.7), run fully offline: Mem0 driven by a
