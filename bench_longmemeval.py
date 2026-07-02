@@ -239,7 +239,7 @@ class ZepBackend:
     def ingest(self, session: list[dict], date: str) -> None:
         from graphiti_core.nodes import EpisodeType
         self.aio.run_until_complete(self.g.add_episode(
-            name=f"session-{date}", episode_body=session_text(session, date)[:8000],
+            name=f"session-{date}", episode_body=session_text(session, date)[:24000],
             source=EpisodeType.message, source_description="chat session",
             reference_time=parse_date(date)))
         self.counter.calls += 4  # graphiti extract/dedupe/edge calls (approximate)
@@ -278,7 +278,7 @@ class LettaBackend:
 
     def ingest(self, session: list[dict], date: str) -> None:
         body = ("Please remember the important facts from this past conversation "
-                f"(dated {date}):\n\n{session_text(session, date)[:8000]}")
+                f"(dated {date}):\n\n{session_text(session, date)[:24000]}")
         self.lc.agents.messages.create(
             agent_id=self.agent.id, messages=[{"role": "user", "content": body}])
         self.counter.calls += 2  # agent turn: reasoning + possible memory-tool calls (approx)
