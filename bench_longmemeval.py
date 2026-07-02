@@ -256,7 +256,60 @@ class ZepBackend:
         return {}
 
 
-BACKENDS = {"cb": CBBackend, "mem0": Mem0Backend, "zep": ZepBackend}
+class LettaBackend:
+    """Letta (MemGPT) via its own server (embedded-postgres backed), ollama model handles.
+    Sessions are delivered as one message per session (the same session-batched framing
+    every other system gets); the question is asked as a message and Letta's own agentic
+    reply IS the answer (its design — no separate answer-generation step)."""
+    name = "letta"
+
+    def __init__(self, model: str, client, counter: Counter):
+        self.counter = counter
+        from letta_client import Letta
+        self.lc = Letta(base_url=os.environ.get("LETTA_BASE", "http://localhost:8283"))
+        self.agent = self.lc.agents.create(
+            memory_blocks=[
+                {"label": "human", "value": "The user; facts about them accumulate here."},
+                {"label": "persona", "value": "A helpful assistant with long-term memory."},
+            ],
+            model=f"ollama/{model}",
+            embedding=f"ollama/{EMBED_MODEL}:latest",
+        )
+
+    def ingest(self, session: list[dict], date: str) -> None:
+        body = ("Please remember the important facts from this past conversation "
+                f"(dated {date}):\n\n{session_text(session, date)[:8000]}")
+        self.lc.agents.messages.create(
+            agent_id=self.agent.id, messages=[{"role": "user", "content": body}])
+        self.counter.calls += 2  # agent turn: reasoning + possible memory-tool calls (approx)
+
+    def retrieve(self, question: str, qdate: str) -> str:
+        return ""  # letta answers directly (agentic); see answer()
+
+    def answer(self, question: str, qdate: str) -> str:
+        r = self.lc.agents.messages.create(
+            agent_id=self.agent.id,
+            messages=[{"role": "user",
+                       "content": f"(Current date: {qdate}) {question} — answer concisely "
+                                  "from what you remember; if you don't know, say so."}])
+        self.counter.calls += 2
+        out = []
+        for m in r.messages:
+            if getattr(m, "message_type", "") == "assistant_message":
+                out.append(getattr(m, "content", "") or "")
+        return " ".join(out).strip()
+
+    def stats(self) -> dict:
+        return {}
+
+    def close(self) -> None:
+        try:
+            self.lc.agents.delete(self.agent.id)
+        except Exception:
+            pass
+
+
+BACKENDS = {"cb": CBBackend, "mem0": Mem0Backend, "zep": ZepBackend, "letta": LettaBackend}
 
 
 # ------------------------------------------------------------------------------ runner ---
@@ -291,9 +344,14 @@ def run_backend(kind: str, questions: list[dict], model: str, out_dir: str,
             for sess, date in zip(q["haystack_sessions"], q["haystack_dates"]):
                 be.ingest(sess, date)
             context = be.retrieve(q["question"], q["question_date"])
-            answer = chat(client, model, _ANSWER_PROMPT.format(
-                context=context or "(no memories retrieved)", qdate=q["question_date"],
-                question=q["question"]), counter)
+            if hasattr(be, "answer"):  # agentic systems (Letta) answer directly by design
+                answer = be.answer(q["question"], q["question_date"])
+            else:
+                answer = chat(client, model, _ANSWER_PROMPT.format(
+                    context=context or "(no memories retrieved)", qdate=q["question_date"],
+                    question=q["question"]), counter)
+            if hasattr(be, "close"):
+                be.close()
             is_abs = str(q["question_id"]).endswith("_abs")
             jp = (_JUDGE_ABS_PROMPT.format(question=q["question"], resp=answer) if is_abs
                   else _JUDGE_PROMPT.format(question=q["question"], gold=q["answer"],
