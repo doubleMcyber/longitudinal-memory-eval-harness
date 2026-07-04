@@ -142,6 +142,32 @@ variant, and at `_s` the CB-vs-Letta accuracy comparison is a tie on the questio
 finished.** That is a real, defensible position; it is not the unconditional win the clause
 demands.
 
+### Why "just complete the `_s` rival runs" would not credibly change this (analyzed 2026-07-03)
+
+The tempting fix is to run Letta (and Zep) to completion at `_s` and hope CB pulls ahead. It
+does not credibly help, for a statistical reason worth stating so no future session repeats the
+28-hour experiment expecting a different answer:
+
+- On the 12 `_s` questions Letta completed before its throughput cut, **Letta and CB got the
+  *exact same single question* right (q4, `single-session-user`); every other one wrong** —
+  1/12 each. There is zero signal of CB superiority on the comparable subset.
+- CB's overall `0.167` (4/24) comes entirely from 3 questions in the *other* 12 that Letta never
+  ran. To finish Letta means a fresh ~28 h run (the runner re-samples, it does not resume).
+- Even in the favorable case (Letta ~2/24, CB 4/24), that is **not statistically distinguishable
+  at n=24** (95% CI ±~0.15; a 2-question gap is well inside it) — and it rests on a subset where
+  the two *exactly tied*. Presenting it as "CB beats Letta" would be the overclaiming this
+  project was red-teamed for.
+- A credible accuracy separation would need **n≈100+**, which at Letta's measured ~70 min/question
+  is **~5 days for Letta alone** (and Zep is throughput-infeasible even at n=1). That is not a
+  local-hardware run; it requires a **fast hosted endpoint for the rivals** — the same
+  provisioning unblock this whole comparison has needed from the start.
+
+So the honest terminal finding stands: with the compute available, **CB posts no credible
+accuracy win over Letta on either variant** (clear loss on oracle; a within-noise tie on `_s`),
+while genuinely beating/tying Mem0 and Zep and leading all three on cost. Closing the Letta gap
+credibly is a *provisioning* task (hosted endpoint → `_s` at n≥100 for every system) plus the
+offline capability work in the CB repo's `PROGRESS.md` roadmap — not an in-session tweak.
+
 ## Configuration disclosures (all in `bench_longmemeval.py`)
 
 - **CB**: nomic embedder via `OpenAICompatEmbedder`; real-embedder gate profile
