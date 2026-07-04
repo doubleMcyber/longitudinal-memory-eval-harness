@@ -10,8 +10,9 @@ on the **oracle** variant (~2 evidence sessions/question — the history *fits* 
 context) **Letta wins** (0.471 vs CB 0.261) because its agent effectively reads the raw
 transcripts and its memory machinery barely engages. On the **`_s`** variant (~50 sessions,
 ~490k chars/question — the history *overflows* any context) that mode collapses: **CB ties
-the best system (0.167, tied with Mem0) and beats Letta (0.083, partial), at 8–24× lower
-cost per question**, and Zep fails to complete a single question. So the roadmap's
+the best system (0.167, tied with Mem0) at 8–24× lower cost per question**; Letta drops to
+~0.083 (a disclosed partial that ties CB on the 12 questions it finished), and Zep fails to
+complete a single question. So the roadmap's
 unconditional "CB ≥ each of Mem0/Letta/Zep" is **not** met (Letta wins oracle); but there is
 a real regime — long histories that don't fit context, i.e. the problem a memory layer
 *exists* to solve — where CB is the accuracy co-leader and the clear cost leader.
@@ -79,8 +80,11 @@ legs are **disclosed partials** (pre-registered cut rules), not full runs:
 |---|---|---|---|---|
 | **Curated Brain** | **0.167** | 24 | **3.1 min** | complete, 0 errors |
 | **Mem0 2.0.7** | **0.167** | 24 | 25.1 min | complete, 0 errors |
-| Letta 0.16.8 | 0.083 | 12 | 70.4 min | **partial** (cut at n=12 per rule) |
+| Letta 0.16.8 | 0.083 (1/12) | 12 | 70.4 min | **partial** — cut at n=12; **ties CB 1/12 on the questions it ran** |
 | Zep (Graphiti+Kuzu) | — | 0 | >120 min | **DNF** (see below) |
+
+*(The Letta 0.083 is over its 12 completed questions, not comparable head-to-head with the
+n=24 figures without care — CB scored 1/12 on those same 12, a tie; see finding 2.)*
 
 **Findings, stated plainly:**
 
@@ -88,12 +92,16 @@ legs are **disclosed partials** (pre-registered cut rules), not full runs:
    Mem0-only-correct, 1 both — a dead heat), but **CB is 8× cheaper** (3.1 vs 25.1 min/q;
    1153 vs 2434 LLM calls). At the scale a memory layer is *for*, CB matches the strongest
    rival's accuracy at a fraction of the cost.
-2. **Letta collapses from 0.471 (oracle) to 0.083 (`_s`)** — below CB — and is the slowest
-   viable system (70 min/q, ~23× CB). This is the predicted result: once history overflows
-   context, its agentic full-context advantage is gone and it must rely on memory recall,
-   where it underperforms. (Cut at n=12 after a pre-registered rule: ≤2/12 correct at
-   ~70 min/q → the ~24 h remaining runtime was not worth it; 1/12 correct. Directional, wide
-   CI.)
+2. **Letta collapses from 0.471 (oracle) to ~0.083 (`_s`)** and is the slowest viable system
+   (70 min/q, ~23× CB). This is the predicted result: once history overflows context, its
+   agentic full-context advantage is gone and it must rely on memory recall, where it
+   underperforms. **Careful on the CB-vs-Letta head-to-head:** Letta was cut at n=12 (1/12
+   correct) per a pre-registered rule (≤2/12 at ~70 min/q → the ~24 h remaining runtime was
+   not worth it). On the **12 questions Letta actually completed, CB also scored 1/12 — a tie,
+   not a win**; CB's higher overall 0.167 comes entirely from the 12 questions Letta never ran
+   (CB got 3/12 there). So against Letta at `_s`, CB **wins on completeness and cost, ties on
+   the shared 12** — the fair statement, not an accuracy win. What is unambiguous is Letta's
+   own oracle→`_s` collapse (0.471→~0.083, Letta vs itself).
 3. **Zep did not complete a single `_s` question in ~2 hours** and was cut. Graphiti issues
    ~200 LLM calls per question to build its graph over 50 sessions; on a local 7B that is
    throughput-infeasible. This is a real finding about graph-construction cost at scale, not
@@ -121,14 +129,17 @@ at ≤ its cost." Measured, unspun:
   0.167=0.167 `_s` exact) and wins decisively on cost on both → **CB ≥ Mem0 holds.**
 - **vs Zep:** CB beats it on oracle accuracy (0.261 vs 0.065) and cost, and Zep is
   infeasible at `_s` → **CB ≥ Zep holds.**
-- **vs Letta:** split — **Letta wins oracle (0.471 vs 0.261); CB wins `_s` (0.167 vs
-  0.083).** So **CB ≥ Letta does NOT hold unconditionally.** The unconditional DONE clause
-  is **not met.**
+- **vs Letta:** split — **Letta wins oracle (0.471 vs 0.261, p=0.0002); at `_s` CB completes
+  the run (0.167) while Letta was cut as a disclosed partial and tied CB on the 12 questions
+  it ran (1/12 each).** So CB does **not** post an accuracy win over Letta on either variant
+  (it loses oracle, ties the shared `_s` subset) — it wins `_s` only on completeness and cost.
+  **CB ≥ Letta does NOT hold on accuracy.** The unconditional DONE clause is **not met.**
 
-The honest headline: **Curated Brain is the accuracy co-leader and the runaway cost leader
-in the regime a memory layer is built for (histories that don't fit context), and it beats
-or ties Mem0 and Zep everywhere — but Letta beats it when the whole history fits the model's
-window.** That is a real, defensible position; it is not the unconditional win the clause
+The honest headline: **Curated Brain is the accuracy co-leader (tied with Mem0) and the
+runaway cost leader in the regime a memory layer is built for (histories that don't fit
+context), and it beats or ties Mem0 and Zep everywhere — but Letta beats it on the oracle
+variant, and at `_s` the CB-vs-Letta accuracy comparison is a tie on the questions Letta
+finished.** That is a real, defensible position; it is not the unconditional win the clause
 demands.
 
 ## Configuration disclosures (all in `bench_longmemeval.py`)
