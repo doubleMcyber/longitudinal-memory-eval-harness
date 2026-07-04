@@ -142,6 +142,36 @@ variant, and at `_s` the CB-vs-Letta accuracy comparison is a tie on the questio
 finished.** That is a real, defensible position; it is not the unconditional win the clause
 demands.
 
+### The oracle gap is arithmetically bounded, not a tuning problem (per-category, 2026-07-03)
+
+Computed from the raw rows, the CB-vs-Letta oracle gap decomposes by category (n=23 each):
+
+| category | CB | Letta | winner |
+|---|---|---|---|
+| knowledge-update | **0.478** | 0.435 | **CB** (its belief-revision thesis works) |
+| single-session-user | 0.522 | 0.565 | Letta (close) |
+| single-session-assistant | 0.261 | **0.957** | Letta (by 0.70 — the decisive gap) |
+| multi-session | 0.174 | 0.217 | Letta (close) |
+| single-session-preference | 0.087 | 0.217 | Letta |
+| temporal-reasoning | 0.043 | 0.435 | Letta (by 0.39 — the fixable gap) |
+
+Two things follow, both honest:
+- **CB is competitive category-by-category and actually beats Letta on knowledge-update** — the
+  belief-revision / bi-temporal-supersede category that is CB's whole thesis. This is not a
+  system that loses everywhere; it loses in *specific* places.
+- **The gap is dominated by `single-session-assistant` (0.261 vs 0.957).** That category asks
+  what the *assistant* said (a shift schedule, a sports stat) — the answer IS the assistant's
+  verbatim long output. Letta gets 0.957 by having that text in context; a curation layer that
+  stores structured facts + k=10 snippets structurally cannot reproduce a verbatim table. If CB
+  matched Letta on every lagging category *and* kept its knowledge-update win, its ceiling is
+  **0.478** (barely above Letta's 0.471); but capping `single-session-assistant` at what curation
+  can realistically reach (~0.6, since it can't full-context-read a table) drops the ceiling to
+  **~0.42 — below Letta's 0.471.** So even a perfect campaign on the fixable categories does not
+  produce CB ≥ Letta on oracle. The one clearly-worth-doing lever is **temporal-reasoning**
+  (0.043 vs 0.435 — date arithmetic over the timestamps CB already stores, NOT full-context
+  reading); it would raise CB meaningfully (~+0.06 overall) as a genuine capability, but not to
+  ≥ Letta. This is why oracle is a ceiling, not a tuning target.
+
 ### Why "just complete the `_s` rival runs" would not credibly change this (analyzed 2026-07-03)
 
 The tempting fix is to run Letta (and Zep) to completion at `_s` and hope CB pulls ahead. It
