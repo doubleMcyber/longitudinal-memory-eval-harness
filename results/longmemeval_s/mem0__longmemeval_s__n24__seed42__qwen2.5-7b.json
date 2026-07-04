@@ -1,0 +1,343 @@
+{
+ "backend": "mem0",
+ "model": "qwen2.5:7b",
+ "n": 24,
+ "accuracy": 0.1667,
+ "accuracy_by_type": {
+  "knowledge-update": 0.5,
+  "multi-session": 0.25,
+  "single-session-assistant": 0.0,
+  "single-session-preference": 0.0,
+  "single-session-user": 0.25,
+  "temporal-reasoning": 0.0
+ },
+ "errors": 0,
+ "cost": {
+  "llm_calls": 2434,
+  "prompt_tokens": 14086,
+  "completion_tokens": 668
+ },
+ "judge_cost": {
+  "calls": 24
+ },
+ "wall_seconds": 36140.6,
+ "notes": [
+  "Same local model (ollama, pinned tag) for every system's LLM calls, answer generation, and judging; same nomic-embed-text embedder for every system.",
+  "Judge is the shared local model with the official yes/no style prompt \u2014 NOT the official GPT-4o judge; treat absolute numbers as internally comparable, not as leaderboard-comparable.",
+  "Mem0/Graphiti internal LLM calls counted approximately (2/add, 4/episode)."
+ ],
+ "rows": [
+  {
+   "question_id": "b29f3365",
+   "type": "temporal-reasoning",
+   "correct": false,
+   "answer": "You had been taking guitar lessons with instructor Alex for six weeks when you bought the new guitar amp two weeks ago.",
+   "gold": "Four weeks",
+   "context": "[2023/05/25 (Thu) 08:18] User has been practicing guitar for at least 30 minutes daily since starting lessons with Alex six weeks ago.\n[2023/05/25 (Thu) 08:18] User recently bought a new guitar amp two weeks ago, which has improved the sound quality of their practice.\n[2023/05/25 (Thu) 03:25] User recently bought a new guitar amp two weeks ago which has improved sound quality.\n[2023/05/25 (Thu) 03:25] User is taking weekly guitar lessons with instructor Alex for six weeks, focusing on music theory understanding.\n[2023/05/25 (Thu) 18:54] User has been using a new amp since June 17, 2026, which significantly improved sound quality compared to their old borrowed amp.\n[2023/05/25 (Thu) 03:25] User has been practicing guitar daily and noticed significant improvement in fingerpicking and chord changes.\n[2023/05/25 (Thu) 18:54] User is looking for advice on choosing the right guitar strings, specifically for an electric guitar to complement a new amp purchased two weeks ago.\n[2023/05/25 (Thu) 11:57] User is looking for advice on choosing guitar strings to complement their new amp and improve their playing experience\n[2023/05/25 (Thu) 06:57] User is looking for advice on choosing the right guitar strings to complement their new amp.\n[2023/05/25 (Thu) 18:54] User has been learning to play the ukulele recently, taking online lessons to learn the basics.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1572.3
+  },
+  {
+   "question_id": "60d45044",
+   "type": "single-session-user",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "Japanese short-grain rice",
+   "context": "[2023/05/27 (Sat) 08:35] User asked for simple Japanese-style recipes that pair well with short-grain rice, specifically for grilled chicken or vegetables.\n[2023/05/27 (Sat) 00:47] User is planning to make onigiri for lunch using Japanese short-grain rice.\n[2023/05/27 (Sat) 12:56] User wanted to make Japanese-style dishes with short-grain rice, including grilled chicken or vegetables.\n[2023/05/27 (Sat) 12:56] Assistant provided tips for shaping perfect onigiri, including using Japanese short-grain rice.\n[2023/05/27 (Sat) 12:56] Assistant offered recipes for yakitori-style grilled chicken as a pairing with short-grain rice.\n[2023/05/27 (Sat) 00:47] Assistant provided tips for shaping perfect onigiri, including the right amount of rice and moisture control.\n[2023/05/29 (Mon) 09:04] User is a 32-year-old Asian American male working as a Senior Data Analyst and uses Tableau for projects, interested in exploring other data visualization tools like Power BI, QlikView, D3.js, Sisense, Looker, Matplotlib/Seaborn, Google Data Studio, Plotly, and ECharts.\n[2023/05/24 (Wed) 13:51] User asked about popular rug styles and materials that would complement a light gray sectional sofa with a subtle pattern.\n[2023/05/29 (Mon) 00:50] User is considering getting a cookbook by her friend\u2019s favorite chef, specifically 'The Barefoot Contessa Cookbook'.\n[2023/05/21 (Sun) 22:19] User is interested in healthier cookie options and flavor combinations like oatmeal raisin with nuts, coconut sugar cookies, almond flour cookies, oat flour cookies, coconut oil cookies, egg-free cookies, cranberry white chocolate chip, peanut butter banana, dark chocolate cherry, pumpkin spice, lemon rosemary, Nutella espresso, cinnamon apple, and maple pecan",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1600.0
+  },
+  {
+   "question_id": "7024f17c",
+   "type": "multi-session",
+   "correct": false,
+   "answer": "You jogged for a total of 30 minutes on Saturday. You intended to practice yoga three times a week (Monday, Wednesday, and Friday) at 7:00 am, but there's no specific mention of actually practicing yoga last week according to the memories provided. Therefore, I don't know how many hours of yoga you did last week.",
+   "gold": "0.5 hours",
+   "context": "[2023/05/20 (Sat) 18:15] User went for a 30-minute jog around the neighborhood on Saturday.\n[2023/05/23 (Tue) 01:39] User used to practice yoga three times a week, each session lasting 2 hours, but has been slacking off recently.\n[2023/05/23 (Tue) 07:32] User practices yoga three times a week, each session lasting two hours, but has been slacking off recently.\n[2023/05/20 (Sat) 21:17] User plans to get more organized with their fitness routine and track workouts, starting with a 30-minute jog on Saturday.\n[2023/05/22 (Mon) 23:10] User will schedule their yoga practice for Monday, Wednesday, and Friday mornings at 7:00 am.\n[2023/05/23 (Tue) 01:39] User is considering scheduling their yoga practice for Monday, Wednesday, and Friday mornings at 7:00 am.\n[2023/05/22 (Mon) 23:10] User is trying to get back into a yoga practice after slacking off for a month.\n[2023/05/24 (Wed) 10:00] User wants tips on staying motivated for a new or resumed yoga practice.\n[2023/05/23 (Tue) 18:03] User wants to stay motivated in their yoga practice by setting realistic goals, creating a schedule, finding a buddy, tracking progress, focusing on how they feel, celebrating small wins, being kind to themselves, mixing it up, and making it a ritual.\n[2023/05/23 (Tue) 01:39] Assistant recommended setting reminders on the user's phone and calendar to stay on track with their yoga practice.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1567.8
+  },
+  {
+   "question_id": "94f70d80",
+   "type": "single-session-user",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "4 hours",
+   "context": "[2023/05/30 (Tue) 09:54] Assistant recommended West Elm, Crate & Barrel, and IKEA as stores to visit for coffee tables with storage.\n[2023/05/23 (Tue) 22:49] Assistant provided an example of syntax in language, such as the sentence structure in 'I have been studying for the past two hours'\n[2023/05/23 (Tue) 22:49] Assistant explained that 'I have been studying for the past two hours' is an example of English grammar rules.\n[2023/05/30 (Tue) 09:54] User is looking for coffee tables with storage space and considering both wooden and glass top options.\n[2023/05/30 (Tue) 09:54] User plans to check out West Elm, Crate & Barrel, and IKEA this weekend to compare their offerings.\n[2023/05/24 (Wed) 14:19] Assistant provided guidance on creating a budget by breaking down the process into manageable steps.\n[2023/05/30 (Tue) 09:54] User will also read online reviews and ratings to evaluate the quality and durability of coffee tables with storage.\n[2023/05/30 (Tue) 21:45] User asked about the difficulty level of assignments and quizzes in the Design Thinking Specialization.\n[2023/05/29 (Mon) 00:32] Assistant provided information on injera baking, berbere spice blend, coffee roasting, kitfo preparation, and tej brewing in Ethiopian cuisine.\n[2023/05/22 (Mon) 10:47] Assistant provided tips on preparing ahead of time and ensuring visually appealing displays for local events.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1438.1
+  },
+  {
+   "question_id": "9bbe84a2",
+   "type": "knowledge-update",
+   "correct": true,
+   "answer": "Your previous goal was to reach level 100 in Apex Legends before the end of the year.",
+   "gold": "level 100",
+   "context": "[2023/09/30 (Sat) 12:45] User's goal is to reach level 150 in Apex Legends eventually.\n[2023/09/30 (Sat) 23:33] User will focus on completing daily and weekly challenges in Apex Legends to earn more experience points and level up faster.\n[2023/09/30 (Sat) 19:35] User plans to complete daily and weekly challenges in Apex Legends to earn more experience points and level up faster.\n[2023/09/30 (Sat) 19:35] User aims to reach level 150 in Apex Legends eventually but prioritizes having fun this weekend.\n[2023/09/30 (Sat) 19:35] User decided to play Apex Legends for fun without focusing on ranking up to level 150 initially.\n[2023/06/25 (Sun) 05:58] User wants to reach level 100 in Apex Legends before the end of the year.\n[2023/09/30 (Sat) 23:33] User is planning a gaming session with friends this weekend and considering playing Apex Legends, focusing on fun rather than ranking up to level 150.\n[2023/09/30 (Sat) 12:45] User decided to play Apex Legends with friends this weekend but will focus on having fun rather than ranking up.\n[2023/09/30 (Sat) 12:45] User will focus on completing daily and weekly challenges to earn more experience points and level up faster.\n[2023/06/16 (Fri) 04:38] User is considering getting a new gaming headset to complete their setup, specifically for good sound quality in Apex Legends.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1628.5
+  },
+  {
+   "question_id": "0ddfec37",
+   "type": "knowledge-update",
+   "correct": false,
+   "answer": "You have added 20 autographed baseballs to your collection in the past few months, according to a memory from December 30, 2023. However, specifically for the first three months of collection, the memories indicate you had 15 autographed baseballs since starting your collection three months ago, as noted on July 11, 2023. Therefore, you added approximately 5 autographed baseballs in the first three months.",
+   "gold": "15",
+   "context": "[2023/12/30 (Sat) 17:17] User is organizing their collection and has added 20 autographed baseballs to it in the past few months.\n[2023/07/11 (Tue) 14:38] User has 15 autographed baseballs since starting their collection three months ago, including a signed Mike Trout baseball.\n[2023/12/30 (Sat) 02:28] User is looking for information on upcoming sports memorabilia auctions in the city and has added 20 autographed baseballs to their collection recently.\n[2023/12/30 (Sat) 17:17] User is considering selling some of their autographed baseballs to make room for new additions.\n[2023/12/30 (Sat) 02:28] User plans to sell some of their autographed baseballs to make room for new additions to their collection.\n[2023/07/20 (Thu) 07:36] User is looking for information on Mike Trout's batting average and home runs, as well as adding a signed baseball to their collection of 15 autographed baseballs.\n[2023/07/20 (Thu) 07:36] User plans to expand their vinyl record collection by including more international pressings, particularly from Japan.\n[2023/12/30 (Sat) 02:28] User intends to sell some of their vinyl records to make space in their collection.\n[2023/07/20 (Thu) 07:36] User is considering attending a stamp show next quarter and wants to know about notable shows or exhibitions coming up in the next few months.\n[2023/07/11 (Tue) 14:38] User is looking for resources to find rare records from Japan for their vinyl collection.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1651.4
+  },
+  {
+   "question_id": "75f70248",
+   "type": "single-session-preference",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "The user would prefer responses that consider the potential impact of their cat, Luna, and her shedding on their sneezing, as well as the recent deep clean of the living room and its possible effect on stirring up dust. They might not prefer responses that fail to take into account these specific details previously mentioned, such as generic suggestions or unrelated factors.",
+   "context": "[2023/05/26 (Fri) 01:15] User has a cat that sheds a lot and needs advice on keeping the living room dust-free\n[2023/05/28 (Sun) 14:27] User has recently found a Victorian-era armchair at an estate sale that they have reupholstered.\n[2023/05/26 (Fri) 01:15] User is considering getting a spider plant or snake plant for air purification and indoor conditions, with good drainage in mind\n[2023/05/26 (Fri) 01:15] User is facing issues with a flickering TV picture and seeks help to troubleshoot or find a repair service in their area\n[2023/05/24 (Wed) 01:54] User is considering setting up different stations or areas for each game, like Scattergories and Codenames.\n[2023/05/28 (Sun) 18:02] User is interested in antique furniture restoration and has started taking classes to learn about identifying wood types and removing old finishes.\n[2023/05/24 (Wed) 03:39] Assistant suggested setting up different stations or areas for each game to create a fun atmosphere.\n[2023/05/23 (Tue) 13:15] Max needs his flea and tick prevention medication applied monthly.\n[2023/05/28 (Sun) 14:27] User is interested in the history of Victorian furniture design and construction, including popular styles like Gothic Revival, Rococo Revival, Neo-Classical, Eastlake, and Art Nouveau.\n[2023/05/23 (Tue) 13:15] User took Max to the vet for vaccinations and check-up about a month ago, which is when he received the last flea and tick prevention medication.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1558.4
+  },
+  {
+   "question_id": "gpt4_213fd887",
+   "type": "temporal-reasoning",
+   "correct": false,
+   "answer": "The charity 5K run for a local children's hospital was completed about a month ago, while you have been playing volleyball in a recreational league with friends from work for about 2 months. Therefore, the charity 5K run likely occurred first.",
+   "gold": "volleyball league",
+   "context": "[2023/05/24 (Wed) 16:56] User recently completed a charity 5K run for a local children's hospital about a month ago.\n[2023/05/24 (Wed) 19:49] User recently completed a charity 5K run about a month ago.\n[2023/05/24 (Wed) 05:10] User recently completed a charity 5K run and wants to build on that experience.\n[2023/05/24 (Wed) 23:16] User has been playing volleyball in a recreational league with friends from work for about 2 months.\n[2023/05/24 (Wed) 23:16] User is trying to improve their fitness, focusing on volleyball serve improvement and overall endurance for a 20-mile cycling event next month.\n[2023/05/24 (Wed) 16:56] Assistant provided tips on finding charity events, including online searches, social media, local running stores, and community centers.\n[2023/05/24 (Wed) 05:10] User is interested in joining a tennis league and preparing for it.\n[2023/05/24 (Wed) 16:56] User is considering joining a tennis league in the spring but hasn't made a final decision.\n[2023/05/24 (Wed) 23:16] User wants to improve their serve and overall fitness, including strength training exercises for volleyball.\n[2023/05/24 (Wed) 23:16] User is interested in joining a tennis league and preparing for it by dusting off their old racket and getting back into practice.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1715.1
+  },
+  {
+   "question_id": "6456829e",
+   "type": "multi-session",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "8",
+   "context": "[2023/05/28 (Sun) 06:58] User is growing cucumbers in their garden and has a bountiful harvest of 3 plants producing many cucumbers\n[2023/05/28 (Sun) 10:27] User is growing cucumbers in their garden and has a bountiful harvest of three plants producing many cucumbers\n[2023/05/26 (Fri) 14:11] User asked how to arrange plants in the raised bed to maximize space and sunlight, considering tomatoes, peppers, cucumbers, and marigolds together.\n[2023/05/29 (Mon) 16:07] Assistant provided tips on keeping tomato plants healthy and productive throughout the season, including soil and sunlight requirements, consistent watering, regular fertilization, pruning and training, mulching and composting, monitoring for pests and diseases, providing support, crop rotation, and weed control\n[2023/05/26 (Fri) 14:11] User is planning to use compost from their homemade compost pile to fertilize tomato plants in the garden.\n[2023/05/29 (Mon) 16:25] User noticed some of their tomato plants were turning yellow and wilted, suspecting overwatering and adjusted the watering schedule accordingly.\n[2023/05/29 (Mon) 16:07] User has been getting a lot of tomatoes from their garden recently and is excited to try the recipe timing well with harvest\n[2023/05/29 (Mon) 16:07] User is looking for recipe ideas featuring fresh tomatoes as the main ingredient and plans to try Bruschetta and Tomato and Mozzarella Salad first\n[2023/05/29 (Mon) 16:07] Assistant provided tips on storing fresh tomatoes, including room temperature storage, stem-side down placement, avoiding washing before use, using paper bags or breathable containers, checking daily for ripeness, and freezing or canning excess\n[2023/05/29 (Mon) 16:25] User asked about storing fresh tomatoes to keep them fresh longer.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1517.3
+  },
+  {
+   "question_id": "b6025781",
+   "type": "single-session-preference",
+   "correct": false,
+   "answer": "Based on your interest in Mexican cuisine and sweet potatoes, here are a few recipe ideas:\n\n1. Chicken Fajitas - Served with grilled chicken, bell peppers, onions, and fajita seasoning.\n2. Roasted Vegetable Quesadillas - Fill tortillas with roasted vegetables like sweet potatoes, bell peppers, and zucchini.\n3. Grilled Chicken Tacos with Mango Salsa - Top grilled chicken with a fresh mango salsa made from diced mango, red onion, jalape\u00f1o, and lime juice.\n4. Vegan Black Bean and Sweet Potato Enchiladas - Layer cooked black beans and roasted sweet potatoes in tortillas, top with enchilada sauce, and bake.\n\nEnjoy your meal prep!",
+   "gold": "The user would prefer responses that suggest healthy meal prep recipes, especially those that incorporate quinoa and roasted vegetables, and offer variations in protein sources. They might appreciate suggestions that build upon their existing preferences, such as new twists on chicken Caesar salads or turkey and avocado wraps. The user may not prefer responses that suggest unhealthy or high-calorie meal prep options, or those that deviate significantly from their established healthy eating habits.",
+   "context": "[2023/05/23 (Tue) 18:00] User's interest in meal prep includes lentil bolognese, quinoa, roasted vegetables, and roasted sweet potatoes\n[2023/05/24 (Wed) 17:44] Assistant suggested chicken fajitas, roasted vegetable quesadillas, grilled chicken tacos with mango salsa, and vegan black bean and sweet potato enchiladas as recipe ideas for Mexican cuisine\n[2023/05/24 (Wed) 17:44] User is interested in trying Mexican-inspired dishes with chicken or vegetables this weekend\n[2023/05/23 (Tue) 18:00] User decided to add roasted sweet potatoes as a side, seeking seasoning ideas\n[2023/05/24 (Wed) 16:46] Assistant recommended Texas-Style BBQ Sauce as a recipe to try based on the user's inspiration from Bubba's BBQ.\n[2023/05/23 (Tue) 18:00] User was suggested grilled chicken, pan-seared salmon, lentil bolognese, and turkey breast as protein sources\n[2023/05/27 (Sat) 22:21] Assistant suggested budget-friendly DIY party favor ideas like sparkly sugar cookies, glittery playdough, and DIY bath bombs.\n[2023/05/24 (Wed) 02:45] User is looking for BBQ sauce recipes, particularly the Texas-Style BBQ Sauce recipe\n[2023/05/24 (Wed) 17:44] User plans to make a batch of sweet potato fries this weekend\n[2023/05/24 (Wed) 16:46] User is looking for BBQ sauce recipes and was inspired by a brisket sandwich at Bubba's BBQ.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1444.0
+  },
+  {
+   "question_id": "32260d93",
+   "type": "single-session-preference",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "The user would prefer recommendations for stand-up comedy specials on Netflix, especially those that are known for their storytelling. They may not prefer recommendations for other genres or platforms.",
+   "context": "[2023/05/29 (Mon) 05:28] User is an aspiring stand-up comedian looking for advice on improving their craft and recommendations for strong storytelling comedy specials like 'Kid Gorgeous' by John Mulaney.\n[2023/05/29 (Mon) 04:39] User is interested in stand-up comedy specials on Netflix with strong storytelling abilities like John Mulaney's 'Kid Gorgeous'.\n[2023/05/29 (Mon) 04:39] Assistant recommended several stand-up comedy specials including 'Homecoming King', 'Hard Knock Wife', and others.\n[2023/05/29 (Mon) 05:28] Assistant recommended stand-up comedy specials like 'Homecoming King' by Hasan Minhaj with strong storytelling abilities for the user to learn from.\n[2023/05/27 (Sat) 01:47] User is looking for recommendations on things to do and see in Denver, Colorado.\n[2023/05/27 (Sat) 02:18] User is planning to organize a game night with friends and will bring Pandemic, along with other games like Carcassonne, Settlers of Catan, 7 Wonders, Ticket to Ride: Europe, and Azul.\n[2023/05/29 (Mon) 04:39] User was recommended several true crime podcasts including 'My Favorite Murder', 'The GaryVee Audio Experience', and others.\n[2023/05/29 (Mon) 04:39] User is looking for online resources or books on comedy writing and storytelling to improve their craft.\n[2023/05/29 (Mon) 01:01] Assistant recommended several true crime podcasts including 'My Favorite Murder', 'Last Podcast on the Left', 'Serial', and others.\n[2023/05/22 (Mon) 23:58] User is interested in healthy sweet treat recipes for around 3 pm cravings",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1376.1
+  },
+  {
+   "question_id": "c8f1aeed",
+   "type": "single-session-assistant",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "Pennsylvania",
+   "context": "[2023/05/21 (Sun) 03:02] Assistant provided information on how fracking affects groundwater quality in the Marcellus Shale region and the measures being developed to monitor it.\n[2023/05/21 (Sun) 07:36] User asked about the impact of fracking on groundwater quality in the Marcellus Shale region.\n[2023/05/21 (Sun) 03:02] User expressed concern about fracking companies self-monitoring their operations and asked who is holding them accountable for any contamination caused to groundwater.\n[2023/05/21 (Sun) 07:36] Assistant provided information on the debate surrounding fracking and its impact on groundwater quality.\n[2023/05/21 (Sun) 03:02] Assistant explained that multiple regulatory bodies, including the EPA, states, and citizens, are responsible for monitoring and enforcing regulations on fracking companies.\n[2023/05/21 (Sun) 07:36] Assistant mentioned that regulatory bodies like the EPA are responsible for monitoring and enforcing regulations on fracking operations.\n[2023/05/21 (Sun) 07:36] Assistant explained that fracking involves injecting water, sand, and chemicals into shale rocks to release natural gas and oil.\n[2023/05/21 (Sun) 07:36] User expressed concern about the lack of accountability for contamination caused by fracking companies.\n[2023/05/21 (Sun) 07:36] User discussed their belief in banning fracking to protect water sources, considering long-term consequences over short-term gains.\n[2023/05/22 (Mon) 18:32] Assistant informed that Grand Teton National Park has paved and unpaved roads with varying conditions depending on weather and maintenance.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1572.0
+  },
+  {
+   "question_id": "3fe836c9",
+   "type": "multi-session",
+   "correct": true,
+   "answer": "The pre-approval amount for the mortgage was $350,000, while the final sale price of the house was $325,000. Therefore, the pre-approval amount was $25,000 more than the final sale price of the house.",
+   "gold": "$25,000",
+   "context": "[2023/05/30 (Tue) 11:17] User is looking to buy a house and needs help calculating mortgage payments, having recently been pre-approved for up to $350,000\n[2023/05/30 (Tue) 05:59] User expects a mortgage payment of around $1,664 per month based on pre-approval.\n[2023/05/29 (Mon) 05:56] User recently got pre-approved for a mortgage with a maximum borrowing amount of $350,000.\n[2023/05/30 (Tue) 05:59] User is pre-approved for a mortgage up to $350,000 and wants help calculating monthly payments.\n[2023/05/23 (Tue) 11:09] User needs information on home maintenance costs after buying a new house.\n[2023/05/23 (Tue) 14:08] User recently bought a house for $325,000 and is budgeting for home maintenance costs.\n[2023/05/23 (Tue) 12:40] User recently bought a house for $325,000 and is budgeting for potential home maintenance costs between $3,250 to $6,500 annually\n[2023/05/23 (Tue) 12:40] Replacement Cost Value (RCV) covers the cost of rebuilding or replacing the home with similar materials, while Actual Cash Value (ACV) is based on current market value\n[2023/05/29 (Mon) 05:56] Mortgage payments can be calculated using factors like loan amount, interest rate, and loan term.\n[2023/05/23 (Tue) 11:09] User asked about average homeowner's insurance premiums in their area.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1955.1
+  },
+  {
+   "question_id": "7a8d0b71",
+   "type": "single-session-assistant",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "$2,000",
+   "context": "[2023/05/24 (Wed) 10:19] Assistant provided a detailed influencer marketing campaign plan for DHL Wellness Retreats, including outreach, content creation, engagement, and partnerships.\n[2023/05/28 (Sun) 18:24] User needs to prioritize tasks for a new marketing campaign aiming to increase brand awareness and generate leads.\n[2023/05/22 (Mon) 10:45] User asked about funding and resources for the British Library to promote British literature and culture globally.\n[2023/05/22 (Mon) 02:07] User participated in a charity gala organized by the local Rotary Club a week before the Cancer Research Walkathon on April 22nd.\n[2023/05/21 (Sun) 17:41] User attended a charity gala organized by the local Rotary Club on April 22nd and bid on a silent auction item.\n[2023/05/24 (Wed) 20:35] Assistant suggested strategies such as education, incentives, peer-to-peer learning, and creating markets for sustainable products.\n[2023/05/28 (Sun) 21:37] User is concerned about forgetting items from their last trip and wants to avoid making the same mistake again.\n[2023/05/21 (Sun) 17:41] User is interested in volunteering at a food bank event similar to the one they helped out at on March 22nd.\n[2023/05/23 (Tue) 04:48] User wants to involve his family in the vacation planning process to make it more collaborative.\n[2023/05/25 (Thu) 00:17] User asked about Leib Litman, a psychologist and entrepreneur who was an Associate Professor of Psychology at Lander College for Men in New York as of September 2021, and co-founder of CloudResearch with interests in social cognition, judgment and decision making, moral psychology, research methodology, and online data collection.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1716.3
+  },
+  {
+   "question_id": "gpt4_2f56ae70",
+   "type": "temporal-reasoning",
+   "correct": false,
+   "answer": "You started using Amazon Prime Video with the HBO add-on most recently.",
+   "gold": "Disney+",
+   "context": "[2023/05/26 (Fri) 17:59] User is planning to attend more concerts in the future.\n[2023/05/26 (Fri) 23:40] User will use the Amazon Prime Video with HBO add-on option to watch 'Westworld'.\n[2023/05/26 (Fri) 23:40] Assistant explained how to add the HBO channel through Amazon Prime Video and its benefits.\n[2023/05/26 (Fri) 18:05] User has been watching YouTube videos on camera collecting and photography techniques to learn more about the history of cameras.\n[2023/05/26 (Fri) 23:40] User is interested in watching 'Westworld' on HBO but unsure if they can access it through Amazon Prime Video with the HBO add-on.\n[2023/05/26 (Fri) 23:40] User is interested in TV shows similar to 'The Handmaid's Tale' and has been watching 'For All Mankind' on Apple TV+\n[2023/05/26 (Fri) 23:40] Assistant explained that 'Westworld' is an HBO original and provided options for accessing it, including HBO Max or purchasing individual episodes/seasons.\n[2023/05/26 (Fri) 17:59] User is interested in indie-rock and pop music.\n[2023/05/26 (Fri) 05:42] User went on a kayaking trip to Tomales Bay with friends last weekend.\n[2023/05/26 (Fri) 18:31] User has been attending therapy sessions twice a week for the past three months to manage mental health.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1758.2
+  },
+  {
+   "question_id": "gpt4_cd90e484",
+   "type": "temporal-reasoning",
+   "correct": false,
+   "answer": "You used your new binoculars for about three weeks before you saw the American goldfinches returning to your neighborhood.",
+   "gold": "Two weeks",
+   "context": "[2023/05/20 (Sat) 20:08] User has been using new binoculars for about three weeks after waiting months, which have significantly improved their birding experience compared to old ones.\n[2023/05/20 (Sat) 22:12] User has been listening to bird calls online and has noticed American goldfinches returning to their neighborhood, which is a sign of spring.\n[2023/05/20 (Sat) 07:56] User's new binoculars have made a significant difference in their birding trips and observations.\n[2023/05/20 (Sat) 07:56] User got new binoculars exactly three weeks ago after months of waiting.\n[2023/05/20 (Sat) 07:56] User has been keeping a birding journal for six months to track their sightings and improve identification skills.\n[2023/05/20 (Sat) 20:08] Assistant suggested spotting scopes like Celestron Ultima 80 Angled Spotting Scope, Vortex Optics Solo 10x25 Monocular, Bushnell Legend Ultra HD 20-60x80 Spotting Scope, and Nikon ACULON 20-60x80 Spotting Scope for birding in Costa Rica.\n[2023/05/20 (Sat) 22:12] Assistant suggested studying bird anatomy and topography, observing body shapes, paying attention to proportions, watching bird videos, and joining a community for guidance.\n[2023/05/20 (Sat) 07:56] User is focusing on bird shapes and silhouettes as part of improving their bird identification skills.\n[2023/05/20 (Sat) 07:56] User has been listening to bird calls online for about a month now, which is helping with their bird identification skills.\n[2023/05/20 (Sat) 22:12] Assistant provided tips on improving bird identification skills, including observing shapes and silhouettes, studying plumage, noting behavior, using field guides, practicing in the field, joining a community, keeping a journal, being patient, and celebrating successes.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1808.7
+  },
+  {
+   "question_id": "2bf43736",
+   "type": "single-session-assistant",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "Chapter 4 of Book 1, titled 'Vocal Prayer and Meditation'.",
+   "context": "[2023/05/21 (Sun) 13:02] User is interested in exploring contemplative prayer and meditation as a way to deepen their connection with God.\n[2023/05/21 (Sun) 13:02] Assistant mentioned that St. Mary's Church offers a contemplative prayer group for weekly meetings.\n[2023/05/22 (Mon) 21:30] User has started taking yoga classes twice a week and practicing meditation for 10 minutes every morning.\n[2023/05/22 (Mon) 23:17] User has started taking yoga classes twice a week and practicing meditation for 10 minutes every morning.\n[2023/05/21 (Sun) 13:02] Assistant recommended daily devotionals for Lent, including 'Lent for Everyone' by N.T. Wright and other options.\n[2023/05/22 (Mon) 23:16] User has been incorporating self-care and relaxation techniques suggested by the assistant, finding them helpful.\n[2023/05/22 (Mon) 23:17] Assistant provided a summary for 10-year-olds of 'Where the Mountain Meets the Moon', focusing on themes of courage and perseverance.\n[2023/05/22 (Mon) 23:16] User has been practicing yoga twice a week and meditating for 10 minutes every morning to help with relaxation and focus.\n[2023/05/22 (Mon) 21:30] User has been journaling and reflecting regularly since starting therapy, finding it helpful for personal growth and insight.\n[2023/05/23 (Tue) 04:47] User plans to start with 'Hamilton: The Revolution' and 'In the Heights: The Making of a Musical' as recommended by assistant.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1573.9
+  },
+  {
+   "question_id": "85fa3a3f",
+   "type": "multi-session",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "$50",
+   "context": "[2023/05/26 (Fri) 02:01] User recently got Max a stainless steel food bowl from Amazon for $15 and a measuring cup from the pet store for $5 for his grain-free kibble\n[2023/05/26 (Fri) 02:20] User recently got Max a stainless steel food bowl from Amazon and a measuring cup from the pet store.\n[2023/05/22 (Mon) 07:04] Assistant helped calculate the average monthly cost of Max's supplies, which is $60 based on recurring expenses for kibble and dental chews.\n[2023/05/22 (Mon) 07:04] User wanted to track the average monthly cost of Max's supplies.\n[2023/05/26 (Fri) 02:20] User is planning to get a new toy for Max, a golden retriever, and considering options like durable squeaky balls or rubber toys with holes.\n[2023/05/26 (Fri) 02:01] User got Max a new dog bed from PetSmart that he enjoys, described as black and brown with a soft cushion\n[2023/05/26 (Fri) 02:20] Assistant recommended durable squeaky balls as toys for Max, a golden retriever.\n[2023/05/26 (Fri) 02:20] User is considering getting a Kong Classic Dog Toy with Holes for Max.\n[2023/05/25 (Thu) 22:20] Assistant recommended several snack subscription box options, including SnackCrate, Love with Food, Graze, MunchPak, SnackSack, UrthBox, Hungryroot, Bean Box, Food52, and The Better Box.\n[2023/05/30 (Tue) 00:50] User is preparing for the upcoming holiday market and needs help with pricing strategies for new jam flavors like spicy pepper jelly and cranberry orange marmalade.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1607.4
+  },
+  {
+   "question_id": "ec81a493",
+   "type": "single-session-user",
+   "correct": true,
+   "answer": "500 copies worldwide.",
+   "gold": "500",
+   "context": "[2023/05/27 (Sat) 15:55] User is thinking of displaying a signed poster from their favorite artist's debut album, which is a limited edition of 500 copies worldwide, alongside an antique clock and a vintage camera.\n[2023/05/28 (Sun) 18:34] User is considering focusing on Instagram for now and expanding to Twitter later.\n[2023/05/23 (Tue) 11:37] User inquired about how frequently people use Messenger for personal versus professional communication.\n[2023/05/21 (Sun) 18:01] User spent a full day preparing for the farmer's market, making labels, packaging jam, and setting up display.\n[2023/05/26 (Fri) 16:02] User has been working on their business since mid-January, handling multiple tasks such as market research and website design.\n[2023/05/23 (Tue) 11:37] Assistant provided statistics from a 2019 Facebook survey indicating that around 70% of people primarily use Messenger for personal communication, while 30% use it for professional purposes.\n[2023/05/24 (Wed) 16:23] User is interested in the musical Hadestown and its storyline, having found out it's coming to their city soon.\n[2023/05/26 (Fri) 13:48] User is working on creating a realistic revenue forecast for GreenStitch Fashion.\n[2023/05/28 (Sun) 13:03] User's cat photo received good engagement with 27 likes, prompting thoughts on expanding cat-related content.\n[2023/05/23 (Tue) 02:47] User is looking for personalized gift ideas for their best friend\u2019s birthday, including photo albums or customized phone cases.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1400.4
+  },
+  {
+   "question_id": "d52b4f67",
+   "type": "single-session-user",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "The Grand Ballroom",
+   "context": "[2023/05/28 (Sun) 22:32] User was at their cousin's wedding last weekend, where they saw their mom look stunning.\n[2023/05/29 (Mon) 17:04] User's family enjoyed their previous visit to LA, spending 7 days there\n[2023/05/29 (Mon) 17:49] User asked about finding local jazz clubs or live music venues in their area.\n[2023/05/20 (Sat) 02:25] User had lunch at a trendy cafe with friend Rachel during a layover in San Francisco but can't remember the name.\n[2023/05/26 (Fri) 23:23] User expressed interest in visiting these wineries to try new wines and learn about the wine-making process\n[2023/05/26 (Fri) 23:23] User asked for recommendations on local wineries to visit in Napa Valley, California\n[2023/05/23 (Tue) 07:19] User asked about sustainable energy events in their area.\n[2023/05/29 (Mon) 17:49] Assistant suggested methods for finding jazz clubs and live music venues, including online searches, Google Maps, social media, and asking around.\n[2023/05/26 (Fri) 21:54] User is interested in visiting Cakebread Cellars winery in Napa Valley.\n[2023/05/29 (Mon) 17:49] User enjoyed their last trip to Los Angeles, having spent 7 days there with family.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1187.8
+  },
+  {
+   "question_id": "852ce960",
+   "type": "knowledge-update",
+   "correct": false,
+   "answer": "You were pre-approved for $350,000 from Wells Fargo.",
+   "gold": "$400,000",
+   "context": "[2023/08/11 (Fri) 00:01] User wants to estimate closing costs for buying a $325,000 house with a pre-approval of $350,000 from Wells Fargo.\n[2023/08/11 (Fri) 00:01] User's monthly mortgage payment is estimated at approximately $1,432, property taxes at $338.54, and insurance at $216.67.\n[2023/08/11 (Fri) 00:01] Estimated closing costs range from $6,082 to $15,072 if the seller covers an additional $3,250 towards closing costs.\n[2023/11/29 (Wed) 08:11] User recently had their car serviced at the dealership on July 15, 2026, where brake pads were replaced for $350.\n[2023/09/18 (Mon) 18:36] User is eyeing a coffee table at West Elm and asked for information on their sales and promotions.\n[2023/08/29 (Tue) 00:11] User wants to know more about the Entrepreneurial Finance course at Stanford GSB.\n[2023/08/26 (Sat) 11:43] Assistant provided information on the Stanford Venture Capital and Private Equity Club, including its activities and networking opportunities.\n[2023/11/30 (Thu) 00:36] Assistant recommended insurance policy review points for Liberty Mutual, including coverage limits, deductibles, exclusions, replacement cost value vs. actual cash value, liability coverage, personal property coverage, additional living expenses, discounts, and policy duration.\n[2023/11/29 (Wed) 12:14] User recently got their car serviced at the dealership on July 15, 2026, with brake pads replaced.\n[2023/09/18 (Mon) 18:36] Assistant provided tips for snagging deals at West Elm, including signing up for the email newsletter, checking the website for sales, looking for seasonal sales, using price match guarantees, considering floor model sales, following social media accounts, and using price comparison tools.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1198.6
+  },
+  {
+   "question_id": "d24813b1",
+   "type": "single-session-preference",
+   "correct": false,
+   "answer": "You can consider making lemon lavender pound cake or chocolate chip cookies using your slow cooker. Both recipes have been successful in previous gatherings. Enjoy your small gathering with colleagues!",
+   "gold": "The user would prefer baking suggestions that take into account their previous success with the lemon poppyseed cake, such as variations of that recipe or other desserts that share similar qualities. They might prefer suggestions that balance impressiveness with manageability, considering their previous experience. The user may not prefer overly complex or unfamiliar recipes, or suggestions that do not build upon their existing baking experience.",
+   "context": "[2023/05/28 (Sun) 14:58] User is hosting a party this weekend and plans to use their new slow cooker from Bed Bath & Beyond for recipe ideas.\n[2023/05/29 (Mon) 00:35] User is hosting a birthday party this weekend and plans to make a lemon lavender pound cake, chocolate chip cookies, and a spinach and artichoke dip using their new slow cooker from Bed Bath & Beyond.\n[2023/05/21 (Sun) 08:00] User is planning to make a vegan lasagna for a family gathering and asked about making a vegan ricotta cheese substitute using cashews.\n[2023/05/29 (Mon) 00:35] Assistant recommended using dried lavender buds for the lemon lavender pound cake recipe.\n[2023/05/29 (Mon) 00:35] User is making a chocolate chip cookie batch with tips on achieving chewy cookies, including using room temperature butter and not overmixing the dough.\n[2023/05/25 (Thu) 00:16] User is planning to try roasting chickpeas as a snack.\n[2023/05/28 (Sun) 14:58] Assistant suggested easy and healthy breakfast recipes for the user's slow cooker, including oatmeal, scrambled eggs, Greek yogurt parfait, breakfast burritos, quinoa bowl, and cinnamon roll oatmeal.\n[2023/05/25 (Thu) 00:16] Assistant recommended various seasonings that go well with olive oil, including garlic and lemon, Italian-style, smoky paprika, cumin and coriander, chili flakes and lime, rosemary and sea salt, and balsamic glaze.\n[2023/05/25 (Thu) 01:02] Assistant suggested seasonings that go well with olive oil, such as garlic and lemon\n[2023/05/28 (Sun) 14:58] User is excited to try out the Spinach and Artichoke Dip recipe in their new slow cooker.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1071.9
+  },
+  {
+   "question_id": "89941a93",
+   "type": "knowledge-update",
+   "correct": true,
+   "answer": "You currently own four bikes: a road bike, a mountain bike, a commuter bike, and a new hybrid bike.",
+   "gold": "4",
+   "context": "[2023/02/22 (Wed) 20:54] User currently owns three bikes: a road bike, a mountain bike, and a commuter bike.\n[2023/03/08 (Wed) 07:33] User has three bikes: a road bike, a mountain bike, and a commuter bike.\n[2023/10/10 (Tue) 01:12] User will have four bikes: a road bike, mountain bike, commuter bike, and a new hybrid bike on their upcoming road trip.\n[2023/02/22 (Wed) 20:54] User has been using their road bike for long rides on weekends and already done 2,000 miles on it.\n[2023/03/08 (Wed) 07:33] User has been doing long rides on weekends and has already completed 2,000 miles on their current road bike.\n[2023/10/10 (Tue) 01:12] Assistant advised the user to consider bike storage, locks, maintenance checks, vehicle storage, and parking when planning for multiple bikes during the trip.\n[2023/10/10 (Tue) 01:12] User recently got a new hybrid bike for their upcoming road trip.\n[2023/03/08 (Wed) 07:33] User is considering upgrading their road bike's wheels to carbon fiber wheels for a century ride.\n[2023/02/22 (Wed) 20:54] User is planning to use their road bike for a century ride soon.\n[2023/02/22 (Wed) 20:54] User wants recommendations on bike computers and GPS devices, considering they've been using their phone's GPS but are thinking of getting a dedicated device.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1197.8
+  },
+  {
+   "question_id": "561fabcd",
+   "type": "single-session-assistant",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "Fissionator.",
+   "context": "[2023/05/29 (Mon) 13:59] User expressed interest in post-apocalyptic shows and movies after finishing 'Breaking Bad'. Assistant recommended 'Fear the Walking Dead', 'Z Nation', 'Colony', 'The 100', 'Jericho', 'Mad Max: Fury Road', 'The Road', 'I Am Legend', '28 Days Later', and 'The Book of Eli'.\n[2023/05/24 (Wed) 00:00] User indicated interest in exploring more stories within The Last of Us universe, particularly focused on Seraphites or Fireflies.\n[2023/05/21 (Sun) 17:07] Assistant provided details on the number of known moons (27) and their names, including Miranda, Ariel, Umbriel, Titania, Oberon, Francisco, Caliban, Stephano, Trinculo, Sycorax, Prospero, Setebos, Ferdinand, Mab, Cupid, Perdita, Portia, Rosalind, Juliet, Belinda, Puck, Cressida, Desdemona, Bianca, Ophelia, Cordelia, and Margaret.\n[2023/05/30 (Tue) 16:49] User asked about cultural and historical references related to Namibia's landscape in stories.\n[2023/05/24 (Wed) 00:00] User expressed interest in The Last of Us Part II and asked about potential sequels or spin-offs.\n[2023/05/28 (Sun) 17:26] User asked about English palindromes and received examples like Hannah, Bob, Eve, Noon, Radar, Madam, Racecar, Civic, Level, Deed\n[2023/05/21 (Sun) 04:03] Assistant provided information about the Alamo's history, location, hours of operation, and suggested planning tips for visitors.\n[2023/05/30 (Tue) 12:02] Namibia has rich cultural and environmental history, including the Sossusvlei sand dunes, Himba people, Twyfelfontein rock engravings, and Kolmanskop ghost town.\n[2023/05/23 (Tue) 04:52] Assistant explained that marigolds and jasmine are commonly used, symbolizing purity and eternal life.\n[2023/05/30 (Tue) 16:49] Assistant stated that the scientific consensus is that climate change is real, caused by human activities.",
+   "stats": {
+    "items": 20
+   },
+   "error": null,
+   "seconds": 1023.1
+  }
+ ]
+}

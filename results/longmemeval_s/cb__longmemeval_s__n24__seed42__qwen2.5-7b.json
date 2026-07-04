@@ -1,0 +1,367 @@
+{
+ "backend": "cb",
+ "model": "qwen2.5:7b",
+ "n": 24,
+ "accuracy": 0.1667,
+ "accuracy_by_type": {
+  "knowledge-update": 0.25,
+  "multi-session": 0.25,
+  "single-session-assistant": 0.0,
+  "single-session-preference": 0.0,
+  "single-session-user": 0.5,
+  "temporal-reasoning": 0.0
+ },
+ "errors": 0,
+ "cost": {
+  "llm_calls": 1153,
+  "prompt_tokens": 395326,
+  "completion_tokens": 75761
+ },
+ "judge_cost": {
+  "calls": 24
+ },
+ "wall_seconds": 4444.1,
+ "notes": [
+  "Same local model (ollama, pinned tag) for every system's LLM calls, answer generation, and judging; same nomic-embed-text embedder for every system.",
+  "Judge is the shared local model with the official yes/no style prompt \u2014 NOT the official GPT-4o judge; treat absolute numbers as internally comparable, not as leaderboard-comparable.",
+  "Mem0/Graphiti internal LLM calls counted approximately (2/add, 4/episode)."
+ ],
+ "rows": [
+  {
+   "question_id": "b29f3365",
+   "type": "temporal-reasoning",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "Four weeks",
+   "context": "[1] User's current Activity is Assembling bed frame (last Sunday).\n[2] User's current Activity Day is Sundays.\n[3] User's current Age is NONE.\n[4] User's current Amazement is feels amazed by the adaptability of plants and their diverse adaptations.\n[5] User's current App for other activities is Strava.\n[6] [2023/05/25 (Thu) 03:25] User's learning method for new instrument is online lessons.\n[7] [2023/05/25 (Thu) 03:25] User's recently bought item is ukulele (about a month ago).\n[8] [2023/05/25 (Thu) 03:25] User's lessons frequency is weekly.\n[9] [2023/05/25 (Thu) 03:25] User's time with current instructor is six weeks.\n[10] [2023/05/25 (Thu) 03:25] User's music theory experience is beginner.",
+   "stats": {
+    "items": 432,
+    "facts": 244
+   },
+   "error": null,
+   "seconds": 159.5
+  },
+  {
+   "question_id": "60d45044",
+   "type": "single-session-user",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "Japanese short-grain rice",
+   "context": "[1] User's current Appreciation is Complexity of sound engineering.\n[2] User's current Approach to Diverse Opinions is Sees value in building relationships with people who have different perspectives to gain understanding and respect for their beliefs.\n[3] User's current Asked_for_snack_options_during_eating_window is Yes.\n[4] User's current Awareness_of_reform_needs is Yes.\n[5] User's current Belief is More people would support organic farming if they knew its benefits.\n[6] [2023/05/27 (Sat) 00:47] User's cuisine_interests is Japanese.\n[7] [2023/05/25 (Thu) 21:52] User's type of mulch considering is straw.\n[8] [2023/05/27 (Sat) 17:26] User's Bike Type is Mountain bike.\n[9] [2023/05/28 (Sun) 23:12] User's gift_recipient_interests is cooking.\n[10] [2023/05/28 (Sun) 06:42] User's Skin type is Combination skin.",
+   "stats": {
+    "items": 432,
+    "facts": 179
+   },
+   "error": null,
+   "seconds": 162.9
+  },
+  {
+   "question_id": "7024f17c",
+   "type": "multi-session",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "0.5 hours",
+   "context": "[1] User's current Accommodation is Flat share in the Marchmont area.\n[2] User's current Action_plan is Check program's website for application requirements.\n[3] User's current Appreciates humor and satire in fiction is True.\n[4] User's current Attended Music Festival During is Summer season.\n[5] User's current Considered Shoe Brands for Summer is Vans.\n[6] [2023/05/22 (Mon) 23:10] User's duration of each yoga session (past) is 2 hours.\n[7] [2023/05/22 (Mon) 23:10] User's frequency of yoga practice (past) is three times a week.\n[8] [2023/05/22 (Mon) 23:10] User's activity is practicing yoga.\n[9] [2023/05/27 (Sat) 22:02] User's shopping_frequency is 2-3 times a week.\n[10] [2023/05/23 (Tue) 18:03] User's Motivation concern is Staying motivated and committed to yoga practice.",
+   "stats": {
+    "items": 408,
+    "facts": 187
+   },
+   "error": null,
+   "seconds": 195.8
+  },
+  {
+   "question_id": "94f70d80",
+   "type": "single-session-user",
+   "correct": true,
+   "answer": "It took you 4 hours to assemble the IKEA bookshelf.",
+   "gold": "4 hours",
+   "context": "[1] [2023/05/30 (Tue) 09:54] User's recent experience is assembling an IKEA bookshelf (4 hours).\n[2] [2023/05/30 (Tue) 09:54] user: I think I'll also stop by IKEA while I'm out to check out their coffee tables with storage, since I had a decent experience assembling that bookshelf. Do you think their coffee tables would be similarly easy to assemble?\n[3] [2023/05/30 (Tue) 09:54] user: I've been leaning towards a wooden top, but now I'm considering the glass top option too. Do you think a glass top would be more prone to scratches or fingerprints compared to wood? Also, by the way, I just assembled an IKEA bookshelf recently and it took me 4 hours, which wasn't too bad.\n[4] [2023/05/30 (Tue) 09:54] assistant: You're welcome! I'm thrilled to have been able to help. It sounds like you have a solid plan in place to find the perfect coffee table with storage for your living room.\n\nRemember to take your time, ask questions, and don't hesitate to reach out if you need any more advice or guidance. And don't forget to measure your space and bring those measurements with you to the stores!\n\nBy combining your in-store visits with online research, you'll be able to make an informed decision and find a coffee table that meets your needs, fits your style, and stays within your budget.\n\nGood luck with your shopping adventure, and I hope you find the perfect coffee table with storage for your living room!\n[5] [2023/05/30 (Tue) 09:54] User's shopping plans is visiting West Elm, Crate & Barrel, and IKEA this weekend.\n[6] [2023/05/30 (Tue) 09:54] user: I was thinking of heading to West Elm this weekend to check out their selection in person. Do you think I should also stop by Crate & Barrel to compare their coffee tables with storage? And how do you think I should prioritize the factors I'm considering, such as style, material, budget, and storage needs?\n[7] [2023/05/30 (Tue) 09:54] user: I'm looking for some recommendations on coffee tables with storage space. Do you have any suggest",
+   "stats": {
+    "items": 436,
+    "facts": 220
+   },
+   "error": null,
+   "seconds": 211.3
+  },
+  {
+   "question_id": "9bbe84a2",
+   "type": "knowledge-update",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "level 100",
+   "context": "[1] User's current goal is pursuing an MBA or taking on additional certifications.\n[2] [2023/09/30 (Sat) 12:45] User's gaming_goal is level 150.\n[3] [2023/10/03 (Tue) 10:52] User's realistic_goals_setting is Suggested.\n[4] [2023/10/03 (Tue) 10:52] User's progress_tracking is Planned.\n[5] [2023/10/01 (Sun) 12:23] User's goal is pursuing an MBA or taking on additional certifications.\n[6] [2023/09/30 (Sat) 12:45] User's improvement_area is overall gameplay.\n[7] [2023/10/01 (Sun) 20:22] User's previous travel destination is Washington D.C..\n[8] [2023/10/01 (Sun) 12:23] User's role is new role.\n[9] [2023/06/16 (Fri) 04:38] User's gaming interest is FPS games like Apex Legends.\n[10] [2023/05/24 (Wed) 15:47] User's tracked_game_progression is Yes.",
+   "stats": {
+    "items": 440,
+    "facts": 256
+   },
+   "error": null,
+   "seconds": 159.9
+  },
+  {
+   "question_id": "0ddfec37",
+   "type": "knowledge-update",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "15",
+   "context": "[1] User's current Additional Item for Sale to Increase Value is Original lens and accessories.\n[2] User's current Amount_spent_today is $60.\n[3] User's current Breakfast Routine is Having oatmeal with banana and honey every morning.\n[4] User's current Concern for future sustainability is Hopeful for better practices.\n[5] User's current Current lunch ingredients is Quinoa, roasted vegetables, protein shake, fruit.\n[6] [2023/12/30 (Sat) 02:28] User's recent activity is added 20 autographed baseballs to the collection in the past few months.\n[7] [2023/12/30 (Sat) 02:28] User's intention is selling autographed baseballs to make room for new additions.\n[8] [2024/01/05 (Fri) 11:33] User's skill is learning how to read people.\n[9] [2023/12/30 (Sat) 02:28] User's hobby is collecting sports memorabilia.\n[10] [2024/01/05 (Fri) 05:47] User's Amount_spent_today is $60.",
+   "stats": {
+    "items": 434,
+    "facts": 227
+   },
+   "error": null,
+   "seconds": 176.5
+  },
+  {
+   "question_id": "75f70248",
+   "type": "single-session-preference",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "The user would prefer responses that consider the potential impact of their cat, Luna, and her shedding on their sneezing, as well as the recent deep clean of the living room and its possible effect on stirring up dust. They might not prefer responses that fail to take into account these specific details previously mentioned, such as generic suggestions or unrelated factors.",
+   "context": "[1] User's current Activity Day is Sundays.\n[2] User's current App for other activities is Strava.\n[3] User's current App for soccer is SoccerPulse.\n[4] User's current Best way to organize digital files and update to-do list is Not explicitly stated.\n[5] User's current Best way to prioritize tasks is Not explicitly stated.\n[6] [2023/05/30 (Tue) 02:47] User's Shopping Interest is Purchasing clothes.\n[7] [2023/05/30 (Tue) 02:47] User's Gift Giving is Buying gift cards.\n[8] [2023/05/28 (Sun) 14:27] User's experience is reupholstered an old armchair from the Victorian era.\n[9] [2023/05/28 (Sun) 14:27] User's search is specific type of vase for family connection.\n[10] [2023/05/27 (Sat) 03:38] User's specific cause is local children's hospital.",
+   "stats": {
+    "items": 399,
+    "facts": 213
+   },
+   "error": null,
+   "seconds": 148.2
+  },
+  {
+   "question_id": "gpt4_213fd887",
+   "type": "temporal-reasoning",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "volleyball league",
+   "context": "[1] User's current Attended Author is Rachel Smith.\n[2] User's current Book Genre Preference is Novels with strong female leads.\n[3] User's current Planned Event is Book launch event for \"The Art of Falling\" (March 1st).\n[4] User's current Previous Experience is Attending a book reading event with Q&A session.\n[5] User's current Recent Event Attendance is Book reading event at local library (January 10th).\n[6] [2023/05/24 (Wed) 09:55] User's future_plans is participate in other local events and markets.\n[7] [2023/05/24 (Wed) 09:55] User's location_of_event is downtown park.\n[8] [2023/05/24 (Wed) 11:09] User's Recent Event Attendance is Book reading event at local library (January 10th).\n[9] [2023/05/24 (Wed) 09:55] User's event_attended is Spring Fling Market.\n[10] [2023/05/24 (Wed) 04:48] User's recent event affecting fitness is late night movie marathon.",
+   "stats": {
+    "items": 355,
+    "facts": 165
+   },
+   "error": null,
+   "seconds": 143.0
+  },
+  {
+   "question_id": "6456829e",
+   "type": "multi-session",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "8",
+   "context": "[1] User's current Accompanied by is Sister and boyfriend (second visit).\n[2] User's current Attended exhibition at is Modern Art Museum.\n[3] User's current Attended field trip to is University Art Museum.\n[4] User's current Awareness is Realizes the thought process behind editing.\n[5] User's current Concerned Topics is Behavioral questions, marriage questions.\n[6] [2023/05/28 (Sun) 06:58] User's Number of cucumber plants is 3.\n[7] [2023/05/26 (Fri) 14:11] User's plants intended for raised bed is tomatoes, peppers, cucumbers, marigolds.\n[8] [2023/05/29 (Mon) 16:07] User's gardening_experience is Growing tomato plants.\n[9] [2023/05/28 (Sun) 06:58] User's Growing is Cucumbers.\n[10] [2023/05/29 (Mon) 16:07] User's storage_tips is Fresh tomatoes.",
+   "stats": {
+    "items": 412,
+    "facts": 219
+   },
+   "error": null,
+   "seconds": 161.6
+  },
+  {
+   "question_id": "b6025781",
+   "type": "single-session-preference",
+   "correct": false,
+   "answer": "Based on your recent interests, you might enjoy trying chicken fajitas or a brisket-inspired dish. Consider using beef broth and red wine in the water pan for added flavor. Enjoy your meal prep!",
+   "gold": "The user would prefer responses that suggest healthy meal prep recipes, especially those that incorporate quinoa and roasted vegetables, and offer variations in protein sources. They might appreciate suggestions that build upon their existing preferences, such as new twists on chicken Caesar salads or turkey and avocado wraps. The user may not prefer responses that suggest unhealthy or high-calorie meal prep options, or those that deviate significantly from their established healthy eating habits.",
+   "context": "[1] User's current meal_planning is planning meals for the weekend.\n[2] [2023/05/24 (Wed) 17:44] User's meal_planning is planning meals for the weekend.\n[3] [2023/05/23 (Tue) 13:10] User's meal prep ingredient is roasted vegetables.\n[4] [2023/05/30 (Tue) 01:21] User's Planning to Add to Reading List is \"The Power\".\n[5] [2023/05/23 (Tue) 13:10] User's meal prep protein source is lentil bolognese.\n[6] [2023/05/24 (Wed) 17:44] User's meal_intent is try to make chicken fajitas this weekend.\n[7] [2023/05/23 (Tue) 13:10] User's snack idea is homemade granola.\n[8] [2023/05/24 (Wed) 02:45] User's intention is trying to make something similar to brisket sandwich at home.\n[9] [2023/05/24 (Wed) 02:45] User's idea is thinking of trying beef broth and red wine in the water pan.\n[10] [2023/05/22 (Mon) 07:12] User's upcoming_event is weekend sculpting workshop (next month).",
+   "stats": {
+    "items": 384,
+    "facts": 204
+   },
+   "error": null,
+   "seconds": 172.2
+  },
+  {
+   "question_id": "32260d93",
+   "type": "single-session-preference",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "The user would prefer recommendations for stand-up comedy specials on Netflix, especially those that are known for their storytelling. They may not prefer recommendations for other genres or platforms.",
+   "context": "[1] [2023/05/29 (Mon) 04:39] user: As an aspiring stand-up comedian, I'm looking for some advice on how to improve my craft. Can you recommend some stand-up comedy specials on Netflix with strong storytelling abilities like John Mulaney's 'Kid Gorgeous'?\n[2] [2023/05/29 (Mon) 01:01] user: I'll definitely check those out. I'm really interested in improving my productivity and time management skills, since my daily commute is pretty long. Speaking of which, do you have any recommendations for podcasts that can help me make the most of my commute?\n[3] [2023/05/29 (Mon) 01:01] user: I'm really interested in the language learning podcasts. I've been meaning to learn a new language for a while now, and my commute seems like the perfect time to do it. Do you have any recommendations for language learning apps that I can use in conjunction with the podcasts?\n[4] [2023/05/26 (Fri) 04:58] user: Can you recommend any good Chinese restaurants in the area?\n[5] [2023/05/25 (Thu) 12:38] user: Wow, all of these dishes sound amazing! Can you recommend a good Thai restaurant in the area?\n[6] [2023/05/24 (Wed) 04:41] user: I'm trying to get organized for my upcoming move. Can you recommend any good moving companies in my area?\n[7] [2023/05/20 (Sat) 21:51] user: Mmm, those all sound delicious! Which one do you recommend trying first?",
+   "stats": {
+    "items": 425,
+    "facts": 182
+   },
+   "error": null,
+   "seconds": 167.8
+  },
+  {
+   "question_id": "c8f1aeed",
+   "type": "single-session-assistant",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "Pennsylvania",
+   "context": "[1] User's current Example is Yes, there are examples of science fiction works that accurately predicted future technological developments..\n[2] [2023/05/21 (Sun) 03:02] User's Trust is Fracking companies.\n[3] [2023/05/21 (Sun) 03:02] User's Stance on fracking is Should be banned.\n[4] [2023/05/23 (Tue) 10:43] User's Gear Maintenance is Checking and cleaning rods and reels before fishing trip.\n[5] [2023/05/24 (Wed) 20:25] User's Interests is Great Smoky Mountains National Park, Eastern Band of Cherokee Indians culture and traditions.\n[6] [2023/05/23 (Tue) 23:46] User's previous_experience is road trip to Asheville, North Carolina (540 miles round-trip).\n[7] [2023/05/23 (Tue) 10:43] User's Fishing Destination is Lake Michigan, southern part of the lake near Indiana border.\n[8] [2023/05/23 (Tue) 23:46] User's destination is Smoky Mountains.\n[9] [2023/05/23 (Tue) 10:43] User's Preferred Fishing Structure is Weed beds and drop-offs.\n[10] [2023/05/24 (Wed) 20:25] User's Last-trip-location is Asheville, North Carolina.",
+   "stats": {
+    "items": 432,
+    "facts": 220
+   },
+   "error": null,
+   "seconds": 170.6
+  },
+  {
+   "question_id": "3fe836c9",
+   "type": "multi-session",
+   "correct": true,
+   "answer": "The pre-approved mortgage amount is $350,000 and the final sale price of the house was $325,000. Therefore, the pre-approval amount was $25,000 more than the final sale price.",
+   "gold": "$25,000",
+   "context": "[1] [2023/05/29 (Mon) 05:56] User's preapproved_mortgage_amount is $350,000.\n[2] [2023/05/29 (Mon) 05:56] user: I'm looking to buy a house and I'm not sure how to calculate my mortgage payments. Can you help me with that? By the way, I recently got pre-approved for a mortgage and the lender said I can borrow up to $350,000.\n[3] [2023/05/23 (Tue) 11:09] User's home purchase price is $325,000.\n[4] [2023/05/29 (Mon) 05:56] user: So the mortgage insurance can add a significant amount to my monthly payments. I'm considering putting down a larger down payment to avoid PMI. How much would I need to put down to avoid PMI on a $350,000 loan?\n[5] [2023/05/23 (Tue) 11:09] user: I'm looking for some info on home maintenance costs. I just bought a house and I want to budget for any potential repairs. By the way, the final sale price was $325,000, which I think is a great deal considering the community pool and playground in the subdivision.\n[6] [2023/05/26 (Fri) 10:13] User's purchase_price is $2,500.\n[7] [2023/05/23 (Tue) 11:09] User's recent event is bought a house.\n[8] [2023/05/26 (Fri) 10:13] User's appraised_value is $5,000.\n[9] [2023/05/23 (Tue) 11:09] User's interest in is home maintenance costs.",
+   "stats": {
+    "items": 369,
+    "facts": 214
+   },
+   "error": null,
+   "seconds": 227.2
+  },
+  {
+   "question_id": "7a8d0b71",
+   "type": "single-session-assistant",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "$2,000",
+   "context": "[1] User's current looking_for is new tote bag.\n[2] [2023/05/28 (Sun) 18:24] User's New Project Type is Marketing campaign.\n[3] [2023/05/28 (Sun) 18:24] User's Campaign Goal is Increase brand awareness, generate leads, drive sales.\n[4] [2023/05/28 (Sun) 18:24] User's Campaign Launch Date is In about 6 weeks.\n[5] [2023/05/28 (Sun) 18:24] User's Target Audience is Business owners and decision-makers in the industry.\n[6] [2023/05/26 (Fri) 09:21] User's motivational element is motivational quotes.\n[7] [2023/05/26 (Fri) 09:21] User's resource usage is browsing online marketplaces like Society6 and Etsy.\n[8] [2023/05/26 (Fri) 02:25] User's knowledge is aware of small changes that can help the environment.\n[9] [2023/05/22 (Mon) 11:26] User's Lifestyle Interest is Running.\n[10] [2023/05/22 (Mon) 11:26] User's Home Purchase Timing is About 8 months ago.",
+   "stats": {
+    "items": 402,
+    "facts": 214
+   },
+   "error": null,
+   "seconds": 280.3
+  },
+  {
+   "question_id": "gpt4_2f56ae70",
+   "type": "temporal-reasoning",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "Disney+",
+   "context": "[1] User's current Action is Checking Out Recommended Contemporary Artists.\n[2] User's current Activity_interest is Cooking with wild mushrooms.\n[3] User's current Asking_about is Best way to order at a BBQ joint.\n[4] User's current Belief is Philosophy does not benefit in practical and real-world scenarios.\n[5] User's current Career Interest is Data Analysis for Marketing Role.",
+   "stats": {
+    "items": 372,
+    "facts": 207
+   },
+   "error": null,
+   "seconds": 226.6
+  },
+  {
+   "question_id": "gpt4_cd90e484",
+   "type": "temporal-reasoning",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "Two weeks",
+   "context": "[1] User's current Action is Planning to read books for learning basics of blockchain.\n[2] User's current Activity is Listening to bird calls online.\n[3] User's current Bird Species is American goldfinches, robins, sparrows.\n[4] User's current Concern is Thinks it is a waste of money and time to visit museums in London.\n[5] User's current Considering Product is Samsung Galaxy Buds Pro for wireless earbuds.\n[6] [2023/05/20 (Sat) 00:04] User's distance_walked is 5 kilometers.\n[7] [2023/05/20 (Sat) 00:38] User's wears_tight_socks is frequently.\n[8] [2023/05/20 (Sat) 02:07] User's recent game experience is played The Witcher 3.\n[9] [2023/05/20 (Sat) 07:58] User's frequency is getting guitar setup and inspected.\n[10] [2023/05/20 (Sat) 00:04] User's raising_money_for is local animal shelter.",
+   "stats": {
+    "items": 453,
+    "facts": 215
+   },
+   "error": null,
+   "seconds": 219.9
+  },
+  {
+   "question_id": "2bf43736",
+   "type": "single-session-assistant",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "Chapter 4 of Book 1, titled 'Vocal Prayer and Meditation'.",
+   "context": "[1] User's current Action is Advocacy for change through public pressure and accountability..\n[2] User's current Attitude towards Industry Adaptation is Embracing New Technology.\n[3] User's current Audiobook listening time is Daily commute.\n[4] User's current Belief is Progress towards diversity and inclusivity is slow but necessary..\n[5] User's current Book recently finished is The Hating Game by Sally Thorne.\n[6] [2023/05/21 (Sun) 13:02] User's Spiritual Growth is Interested in exploring other ways to connect with God.\n[7] [2023/05/21 (Sun) 13:02] User's Technology Use is Interested in using online resources or apps for tracking devotions, prayer, and meditation.\n[8] [2023/05/21 (Sun) 13:02] User's Devotional Resource is Planning to check out \"Lent for Everyone\" devotional.\n[9] [2023/05/22 (Mon) 21:30] User's activity is journaling and reflection.\n[10] [2023/05/20 (Sat) 23:05] User's yoga practice days is Monday and Wednesday mornings.",
+   "stats": {
+    "items": 396,
+    "facts": 196
+   },
+   "error": null,
+   "seconds": 209.3
+  },
+  {
+   "question_id": "85fa3a3f",
+   "type": "multi-session",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "$50",
+   "context": "[1] User's current cost_dental_chews is $10 per pack.\n[2] [2023/05/22 (Mon) 07:04] User's cost_dental_chews is $10 per pack.\n[3] [2023/05/22 (Mon) 07:04] User's one_time_expense is flea and tick collar.\n[4] [2023/05/22 (Mon) 07:04] User's expense_item is dental chews.\n[5] [2023/05/30 (Tue) 00:50] User's pricing strategy is discount for buying 3 or more jars of different flavors (10% off).\n[6] [2023/05/25 (Thu) 10:36] User's purchase cost is $1,500.\n[7] [2023/05/30 (Tue) 00:50] User's product is cranberry orange marmalade.\n[8] [2023/05/26 (Fri) 02:01] User's pet_name is Max.\n[9] [2023/05/25 (Thu) 22:20] User's Snack discovery method is Healthy snack subscription boxes.\n[10] [2023/05/26 (Fri) 02:01] User's considering_purchase is rubber toy with holes.",
+   "stats": {
+    "items": 427,
+    "facts": 234
+   },
+   "error": null,
+   "seconds": 253.4
+  },
+  {
+   "question_id": "ec81a493",
+   "type": "single-session-user",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "500",
+   "context": "[1] User's current Appreciation is Independent filmmakers gaining recognition.\n[2] User's current Artist Appreciation is Lin-Manuel Miranda.\n[3] User's current Balancing Work and Personal Life is In progress.\n[4] User's current Belief about writing is Considers writing a craft, not just convenience..\n[5] User's current Cafe Area is Wicker Park.\n[6] [2023/05/29 (Mon) 10:57] User's Has points from credit card is Over 10,000 points.\n[7] [2023/05/29 (Mon) 23:16] User's progress is making good progress.\n[8] [2023/05/29 (Mon) 23:16] User's occupation is working on thesis.\n[9] [2023/05/30 (Tue) 02:42] User's Friend's Name is Rachel.\n[10] [2023/05/29 (Mon) 10:40] User's age is 249.",
+   "stats": {
+    "items": 401,
+    "facts": 209
+   },
+   "error": null,
+   "seconds": 163.8
+  },
+  {
+   "question_id": "d52b4f67",
+   "type": "single-session-user",
+   "correct": true,
+   "answer": "You attended your cousin's wedding in the Grand Ballroom.",
+   "gold": "The Grand Ballroom",
+   "context": "[1] User's current Age is late 40s.\n[2] User's current Area of Interest is Sustainable Energy Events.\n[3] User's current Body type is A type with a lot of fat in the lower body.\n[4] User's current Budget Consideration is Investing in a good quality saxophone as a beginner.\n[5] User's current Climate preference is Cold person.\n[6] [2023/05/28 (Sun) 19:17] User's location_recent_event is Grand Ballroom (cousin's wedding).\n[7] [2023/05/29 (Mon) 17:49] User's Recent Concert Experience is Billie Eilish.\n[8] [2023/05/29 (Mon) 17:04] User's Last Visit Location is Los Angeles.\n[9] [2023/05/29 (Mon) 17:49] User's Planning is Attending jazz festivals and events.\n[10] [2023/05/26 (Fri) 14:18] User's planning_to_participate_in is charity event.",
+   "stats": {
+    "items": 398,
+    "facts": 175
+   },
+   "error": null,
+   "seconds": 164.5
+  },
+  {
+   "question_id": "852ce960",
+   "type": "knowledge-update",
+   "correct": true,
+   "answer": "The preapproval_amount from Wells Fargo is $400,000.",
+   "gold": "$400,000",
+   "context": "[1] User's current Action is Discussed protocol combinations hypothetically.\n[2] User's current Author Interest is Joe Abercrombie and Brandon Sanderson.\n[3] User's current Booking Agency is Happy Trails Travel Agency.\n[4] User's current Brake Pads Cost is $350.\n[5] User's current Budget for portable charger is $20-$50.\n[6] [2023/11/30 (Thu) 00:36] User's preapproval_bank is Wells Fargo.\n[7] [2023/11/30 (Thu) 00:36] User's preapproval_amount is $400,000.\n[8] [2023/11/29 (Wed) 08:11] User's Purpose for Money from Sale is Bike rack.\n[9] [2023/08/11 (Fri) 00:01] User's pre-approved loan amount is $350,000.\n[10] [2023/10/27 (Fri) 18:02] User's certification_held is Data Analysis.",
+   "stats": {
+    "items": 333,
+    "facts": 148
+   },
+   "error": null,
+   "seconds": 124.7
+  },
+  {
+   "question_id": "d24813b1",
+   "type": "single-session-preference",
+   "correct": false,
+   "answer": "Based on your previous interests, you might enjoy baking a lavender cake for your colleagues. It's unique and would be a nice treat for a small gathering. Make sure to store it at room temperature or in the fridge as preferred. Enjoy your party!",
+   "gold": "The user would prefer baking suggestions that take into account their previous success with the lemon poppyseed cake, such as variations of that recipe or other desserts that share similar qualities. They might prefer suggestions that balance impressiveness with manageability, considering their previous experience. The user may not prefer overly complex or unfamiliar recipes, or suggestions that do not build upon their existing baking experience.",
+   "context": "[1] User's current 401k_contribution_rate is 10%.\n[2] User's current Bought_from is Bed_Bath_&_Beyond.\n[3] User's current Budget Consideration is Interested in affordable alternatives to cashmere.\n[4] User's current Budget Range is $300-$500.\n[5] User's current Camera Model is Canon EOS 80D.\n[6] [2023/05/28 (Sun) 14:58] User's Looking_for_recipe_ideas_for is Party_this_weekend.\n[7] [2023/05/29 (Mon) 00:35] User's cake_flavor is lavender.\n[8] [2023/05/28 (Sun) 14:58] User's Interested_in_cleaning_and_maintenance_tips_for is Slow_cooker.\n[9] [2023/05/29 (Mon) 00:35] User's cake_storage is at room temperature or in the fridge.\n[10] [2023/05/25 (Thu) 19:52] User's meal prep day is Sunday.",
+   "stats": {
+    "items": 436,
+    "facts": 229
+   },
+   "error": null,
+   "seconds": 188.0
+  },
+  {
+   "question_id": "89941a93",
+   "type": "knowledge-update",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "4",
+   "context": "[1] User's current Action is Considering watching virtual performances.\n[2] User's current Activity is Taking salsa classes on Tuesday evenings.\n[3] User's current Awareness is Heard of \"Jagged Little Pill\" and \"Slave Play\".\n[4] User's current Concerned About US Citizenship with Italian Dual Citizenship is Yes.\n[5] User's current Considering Dual Citizenship is Italy.\n[6] [2023/10/10 (Tue) 01:12] User's new purchase is hybrid bike.\n[7] [2023/10/10 (Tue) 01:12] User's accommodation need is bike storage.\n[8] [2023/10/10 (Tue) 01:12] User's preferred cycling days is 3-4 days.\n[9] [2023/10/10 (Tue) 01:12] User's accessory is clipless pedals, cycling shoes.\n[10] [2023/10/10 (Tue) 01:12] User's bike preparation is check bike computer, track progress on Strava.",
+   "stats": {
+    "items": 426,
+    "facts": 212
+   },
+   "error": null,
+   "seconds": 180.1
+  },
+  {
+   "question_id": "561fabcd",
+   "type": "single-session-assistant",
+   "correct": false,
+   "answer": "I don't know.",
+   "gold": "Fissionator.",
+   "context": "[1] User's current Action is Renamed user via terminal.\n[2] User's current Belief in Future Alternatives is There will eventually be alternatives to animal testing that are just as effective..\n[3] User's current Believes_in_climate_change is Real_issue.\n[4] User's current Checkout preference is Self-checkout lane (for earning points).\n[5] User's current Commute duration is Stuck on the train for 30 minutes during morning commutes.\n[6] [2023/05/30 (Tue) 17:19] User's name idea is Fissionator.\n[7] [2023/05/30 (Tue) 17:19] User's game element is transformed zombies with increased damage.\n[8] [2023/05/30 (Tue) 17:19] User's character design is slime-parasite trying to escape through a gash in the neck.\n[9] [2023/05/29 (Mon) 13:59] User's preferred_genre is Post-apocalyptic.\n[10] [2023/05/29 (Mon) 13:59] User's TV_show_watched is The Walking Dead.",
+   "stats": {
+    "items": 407,
+    "facts": 226
+   },
+   "error": null,
+   "seconds": 176.3
+  }
+ ]
+}

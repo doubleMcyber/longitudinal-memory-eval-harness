@@ -1,0 +1,163 @@
+{
+ "backend": "letta",
+ "model": "qwen2.5:7b",
+ "n": 12,
+ "accuracy": 0.0833,
+ "accuracy_by_type": {
+  "knowledge-update": 0.0,
+  "multi-session": 0.0,
+  "single-session-assistant": 0.0,
+  "single-session-preference": 0.0,
+  "single-session-user": 0.5,
+  "temporal-reasoning": 0.0
+ },
+ "errors": 0,
+ "cost": {
+  "llm_calls": 1254,
+  "prompt_tokens": 0,
+  "completion_tokens": 0
+ },
+ "judge_cost": {
+  "calls": 12
+ },
+ "wall_seconds": 50693.5,
+ "notes": [
+  "Same local model (ollama, pinned tag) for every system's LLM calls, answer generation, and judging; same nomic-embed-text embedder for every system.",
+  "Judge is the shared local model with the official yes/no style prompt \u2014 NOT the official GPT-4o judge; treat absolute numbers as internally comparable, not as leaderboard-comparable.",
+  "Mem0/Graphiti internal LLM calls counted approximately (2/add, 4/episode)."
+ ],
+ "rows": [
+  {
+   "question_id": "b29f3365",
+   "type": "temporal-reasoning",
+   "correct": false,
+   "answer": "I don't have specific information about when you bought the new guitar amp or how long you had been taking guitar lessons at that time. Could you provide more context or clarify your question?",
+   "gold": "Four weeks",
+   "context": "",
+   "stats": {},
+   "error": null,
+   "seconds": 5823.3
+  },
+  {
+   "question_id": "60d45044",
+   "type": "single-session-user",
+   "correct": false,
+   "answer": "I don't have information about your specific preferences for rice. If you can provide more details or context, I'd be happy to help further.",
+   "gold": "Japanese short-grain rice",
+   "context": "",
+   "stats": {},
+   "error": null,
+   "seconds": 4568.9
+  },
+  {
+   "question_id": "7024f17c",
+   "type": "multi-session",
+   "correct": false,
+   "answer": "I don't have specific records of your jogging and yoga activities from last week. Would you like me to help you track these activities moving forward?",
+   "gold": "0.5 hours",
+   "context": "",
+   "stats": {},
+   "error": null,
+   "seconds": 4207.5
+  },
+  {
+   "question_id": "94f70d80",
+   "type": "single-session-user",
+   "correct": true,
+   "answer": "Based on your previous conversation, it took you 4 hours to assemble the IKEA bookshelf.",
+   "gold": "4 hours",
+   "context": "",
+   "stats": {},
+   "error": null,
+   "seconds": 4755.4
+  },
+  {
+   "question_id": "9bbe84a2",
+   "type": "knowledge-update",
+   "correct": false,
+   "answer": "I don't have specific information about your previous goals for your Apex Legends level from our conversation history. If you need help setting a new goal or recalling past ones, feel free to share more details!",
+   "gold": "level 100",
+   "context": "",
+   "stats": {},
+   "error": null,
+   "seconds": 3893.9
+  },
+  {
+   "question_id": "0ddfec37",
+   "type": "knowledge-update",
+   "correct": false,
+   "answer": "I don't have specific information about your collection of autographed baseballs or any records of how many you've added in the first three months. If you can provide more details or check your records, I can help you determine the number.",
+   "gold": "15",
+   "context": "",
+   "stats": {},
+   "error": null,
+   "seconds": 3867.4
+  },
+  {
+   "question_id": "75f70248",
+   "type": "single-session-preference",
+   "correct": false,
+   "answer": "It's possible that allergens or irritants in your living room could be causing your sneezing. Check for dust, pet dander, or mold and consider cleaning or improving air quality. If the issue persists, it might be a good idea to consult an allergist.",
+   "gold": "The user would prefer responses that consider the potential impact of their cat, Luna, and her shedding on their sneezing, as well as the recent deep clean of the living room and its possible effect on stirring up dust. They might not prefer responses that fail to take into account these specific details previously mentioned, such as generic suggestions or unrelated factors.",
+   "context": "",
+   "stats": {},
+   "error": null,
+   "seconds": 3481.3
+  },
+  {
+   "question_id": "gpt4_213fd887",
+   "type": "temporal-reasoning",
+   "correct": false,
+   "answer": "Based on the information available, I don't have specific details about which event you participated in first between the volleyball league and the charity 5K run. Without additional context or memories from our conversations, I cannot determine the order of your participation in these events.",
+   "gold": "volleyball league",
+   "context": "",
+   "stats": {},
+   "error": null,
+   "seconds": 4034.2
+  },
+  {
+   "question_id": "6456829e",
+   "type": "multi-session",
+   "correct": false,
+   "answer": "You initially planted 5 tomato plants. However, the number of cucumber plants is not specified in the information you provided.",
+   "gold": "8",
+   "context": "",
+   "stats": {},
+   "error": null,
+   "seconds": 3912.1
+  },
+  {
+   "question_id": "b6025781",
+   "type": "single-session-preference",
+   "correct": false,
+   "answer": "Sure! Here are a few recipe ideas to help with your meal prep:\n\n1. **Chicken and Veggie Stir-Fry**\n   - Ingredients: Chicken breast, bell peppers, snap peas, carrots, garlic, soy sauce, ginger.\n   - Instructions: Slice the chicken and vegetables. Stir-fry in a large pan with garlic, ginger, and soy sauce.\n\n2. **Quinoa Salad with Avocado and Cherry Tomatoes**\n   - Ingredients: Quinoa, cherry tomatoes, avocado, cucumber, red onion, lemon juice, olive oil, salt, pepper.\n   - Instructions: Cook the quinoa and mix it with diced vegetables, avocados, and a simple vinaigrette.\n\n3. **Sheet Pan Chicken Fajitas**\n   - Ingredients: Marinated chicken breast strips, bell peppers, onions, fajita seasoning, tortilla chips.\n   - Instructions: Arrange chicken and veggies on a baking sheet with seasonings, bake until cooked through.\n\n4. **Turkey Meatballs with Marinara and Spinach Pasta**\n   - Ingredients: Turkey meat, breadcrumbs, egg, Parmesan cheese, spinach, marinara sauce, pasta.\n   - Instructions: Form turkey mixture into meatballs, cook in marinara sauce. Serve over spinach-enriched pasta.\n\n5. **Lentil Soup with Cauliflower and Carrots**\n   - Ingredients: Lentils, carrots, cauliflower, tomatoes, onions, celery, spices (cumin, coriander).\n   - Instructions: Saut\u00e9 vegetables, add lentils and broth to simmer until everything is tender.\n\nThese recipes are versatile and can be prepared in bulk for easy meal prep! Enjoy your cooking!",
+   "gold": "The user would prefer responses that suggest healthy meal prep recipes, especially those that incorporate quinoa and roasted vegetables, and offer variations in protein sources. They might appreciate suggestions that build upon their existing preferences, such as new twists on chicken Caesar salads or turkey and avocado wraps. The user may not prefer responses that suggest unhealthy or high-calorie meal prep options, or those that deviate significantly from their established healthy eating habits.",
+   "context": "",
+   "stats": {},
+   "error": null,
+   "seconds": 4184.3
+  },
+  {
+   "question_id": "32260d93",
+   "type": "single-session-preference",
+   "correct": false,
+   "answer": "Sure! How about watching \"Stranger Things\" season 4? It's captivating and perfect for a night in. \ud83c\udf7f\u26a1",
+   "gold": "The user would prefer recommendations for stand-up comedy specials on Netflix, especially those that are known for their storytelling. They may not prefer recommendations for other genres or platforms.",
+   "context": "",
+   "stats": {},
+   "error": null,
+   "seconds": 3761.1
+  },
+  {
+   "question_id": "c8f1aeed",
+   "type": "single-session-assistant",
+   "correct": false,
+   "answer": "Based on our previous conversation, I don't have a specific state in mind that was mentioned as requiring fracking companies to monitor groundwater quality before and after drilling in the Marcellus Shale region. However, many states, including Pennsylvania, do require pre-drilling and post-drilling monitoring of groundwater quality.\n\nWould you like more detailed information on any particular state or related practices?",
+   "gold": "Pennsylvania",
+   "context": "",
+   "stats": {},
+   "error": null,
+   "seconds": 4204.0
+  }
+ ]
+}

@@ -163,6 +163,18 @@ class Mem0Backend:
         fac.VectorStoreFactory.create = staticmethod(lambda *a, **k: Qdrant(
             collection_name="h", embedding_model_dims=EMBED_DIM,
             client=QdrantClient(location=":memory:")))
+        # mem0 robustness patch (disclosed): at _s scale its extraction sometimes yields an
+        # empty memory string; ollama returns {"embeddings": []} for empty input and mem0's
+        # embedder raises, killing the whole question. Substitute a space — never a score.
+        from mem0.embeddings.ollama import OllamaEmbedding
+        if not getattr(OllamaEmbedding, "_lme_patched", False):
+            _orig = OllamaEmbedding.embed
+
+            def _safe(self, text, memory_action=None):
+                return _orig(self, text if (text and str(text).strip()) else " ",
+                             memory_action)
+            OllamaEmbedding.embed = _safe
+            OllamaEmbedding._lme_patched = True
         from mem0 import Memory
         self.mem = Memory.from_config({
             "llm": {"provider": "ollama",
@@ -266,7 +278,11 @@ class LettaBackend:
     def __init__(self, model: str, client, counter: Counter):
         self.counter = counter
         from letta_client import Letta
-        self.lc = Letta(base_url=os.environ.get("LETTA_BASE", "http://localhost:8283"))
+        # At _s scale a single agent turn (24k-char session message -> long prefill +
+        # possible memory tool calls on a local 7B) can exceed the SDK's default HTTP
+        # timeout, which failed EVERY question of the first _s attempt with APITimeoutError.
+        self.lc = Letta(base_url=os.environ.get("LETTA_BASE", "http://localhost:8283"),
+                        timeout=1800.0)
         self.agent = self.lc.agents.create(
             memory_blocks=[
                 {"label": "human", "value": "The user; facts about them accumulate here."},
