@@ -199,6 +199,42 @@ Two things follow, both honest:
   reading); it would raise CB meaningfully (~+0.06 overall) as a genuine capability, but not to
   ≥ Letta. This is why oracle is a ceiling, not a tuning target.
 
+### Temporal-reasoning lever — BUILT, MEASURED, and found NULL-lift (2026-07-06)
+
+The predicted ~+0.06 above was a hypothesis. We tested it end-to-end and it did **not** hold.
+
+We built the *date-on-retrieval* form of the lever in the CB library (firewall-clean: a
+`QueryPlan.temporal` intent on ordering cues, `[YYYY-MM-DD]`-prefixed episodic-event retrieval,
+the "current X is Y" backstop skipped and vector recall unscoped for temporal questions so the
+events being ordered actually surface). Every blind gate stayed green — the CB diagnostic
+determinism hash `673a25c7…` was byte-identical (the temporal intent fires on 0/25 diagnostic
+probes) and a separate Opus-4.8 reviewer passed it. Then we measured it here, CB-only, on the
+`temporal-reasoning` subset of `longmemeval_oracle` (local `qwen2.5:7b`, seed 42, rigorous
+before/after via `git stash`):
+
+| run | before (no feature) | after (feature) | net |
+|---|---|---|---|
+| n=30 (naive v1) | 0.100 (3/30) | 0.067 (2/30) | −1 (regressed) |
+| n=50 (redesigned) | 0.100 (5/50) | 0.100 (5/50) | 0 (1 gained / 1 lost) |
+
+**Root cause (inspected, not guessed).** CB's stored dates are *uniform per session*: the
+extractor stamps every fact from a session with that session's `valid_from`. So dating the fact
+lines adds no ordering signal — it is noise that *dilutes* the real cue, which for these oracle
+questions is usually already in the raw text. Concretely, `gpt4_2487a7cb` ("which did I attend
+first, the workshop or the webinar?") was **correct before**: line 3 read "…Participated in a
+webinar on Data Analysis using Python **two months ago**" and the model reasoned from that text.
+The naive feature prefixed all five lines with the *same* `[2023-05-28]`, drowning that cue, and
+the model answered "I don't know." The redesign stops dating facts, but the net stays flat: the
+signal these questions need isn't in CB's timestamps.
+
+**Decision.** Per the pre-registered rule ("ship only if a real lift; else revert and report the
+negative"), the feature was **reverted** — nothing shipped to CB but this finding. The real fix
+is upstream: **distinct-dated extraction** — parse the event date out of the turn text ("two
+months ago", "last February", explicit dates) and stamp facts with their *true event date*, not
+the session date. Only then does dated retrieval have something to order. Filed as the next
+lever. (The general `--type <question_type>` filter added to `bench_longmemeval.py` for this
+before/after stays — it is how the follow-up will be measured.)
+
 ### Why "just complete the `_s` rival runs" would not credibly change this (analyzed 2026-07-03)
 
 The tempting fix is to run Letta (and Zep) to completion at `_s` and hope CB pulls ahead. It

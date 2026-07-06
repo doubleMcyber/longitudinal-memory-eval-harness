@@ -427,9 +427,14 @@ def main():
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--model", default="qwen2.5:7b")
     ap.add_argument("--out", default="results/longmemeval")
+    ap.add_argument("--type", default=None,
+                    help="restrict to one question_type (e.g. temporal-reasoning) before sampling")
     args = ap.parse_args()
 
     data = json.load(open(args.data))
+    if args.type:
+        data = [q for q in data if q["question_type"] == args.type]
+        print(f"filtered to question_type={args.type}: {len(data)} questions")
     questions = stratified_sample(data, args.n, args.seed)
     os.makedirs(args.out, exist_ok=True)
     tag = f"{os.path.basename(args.data)}__n{len(questions)}__seed{args.seed}__" \
