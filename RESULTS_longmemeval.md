@@ -235,6 +235,35 @@ the session date. Only then does dated retrieval have something to order. Filed 
 lever. (The general `--type <question_type>` filter added to `bench_longmemeval.py` for this
 before/after stays — it is how the follow-up will be measured.)
 
+### Distinct-dated extraction — the follow-up, also NULL (2026-07-07)
+
+We built the "real fix" above. A deterministic offline resolver (`curated_brain/dates.py`,
+shipped in CB) turns in-text expressions ("two months ago", "last February", "on 2023-03-15")
+into absolute event dates; the harness `CBBackend` prefixes each ingested turn with its *resolved*
+event date so events mentioned in the same session get distinct dates, and a temporal-intent
+retrieval surfaces those dated event turns (skips the attribute backstop, recalls unscoped).
+
+The data supported it: **26/50 temporal questions carry a resolvable in-text date** in their
+evidence (74 turns total). But the measured result, same n=50 seed-42 temporal subset vs the same
+HEAD baseline (0.100):
+
+| run | before | after | net |
+|---|---|---|---|
+| distinct-dated ingest + temporal retrieval | 0.100 (5/50) | **0.080 (4/50)** | −1 (0 gained / 1 lost) |
+
+Null again, and slightly worse. The flagship `gpt4_2487a7cb` was **still lost** — this time the
+temporal retrieval **emptied the context** (skipping the backstop plus an empty unscoped vector
+recall left nothing, so the model answered "I don't know").
+
+**Conclusion — the temporal-retrieval family is closed (two nulls).** The bottleneck is not the
+dates: with 26/50 questions carrying resolvable dates and a mechanism that surfaces them, accuracy
+still did not move. At the local 7B the answerer/judge does not convert dated context into correct
+orderings, and CB's open-ended temporal retrieval is fragile. A credible temporal lift needs a
+**stronger answerer/judge (the hosted-endpoint dependency)**, not more retrieval tuning. Reverted
+in CB and the harness; the only thing kept is the reusable, correctness-motivated `dates.py` (CB's
+opt-in `HeuristicExtractor(resolve_dates=True)` now records correct bi-temporal `valid_from` for
+dated events — useful for as-of queries regardless of this benchmark).
+
 ### Why "just complete the `_s` rival runs" would not credibly change this (analyzed 2026-07-03)
 
 The tempting fix is to run Letta (and Zep) to completion at `_s` and hope CB pulls ahead. It
