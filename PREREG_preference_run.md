@@ -34,3 +34,16 @@ No second attempt tuned against these numbers in this session.
 Gate A (diagnostic suite) was re-verified byte-identical (hash 673a25c7) at library commit
 `7a3a777` before this file was written. No LongMemEval preference numbers have been looked at
 since the 2026-07-02/03 runs recorded in RESULTS_longmemeval.md.
+
+## Result (2026-07-10, appended after the frozen run — no tuning followed)
+
+NULL, exactly: arm A 0.100 (3/30) = arm B 0.100 (3/30), 0 gained / 0 lost, 0 errors, identical
+per-question outcomes. Mechanism (inspected, not assumed): the lever barely engaged — only 3/30
+arm-B contexts contained any `preference:*` fact and 26/30 served contexts were byte-identical to
+arm A, because the session-level LLM extraction (qwen2.5:7b) rarely emits likes/favorite-shaped
+attribute lines for these conversations; where it did, the answer/judge did not flip. Per the
+pre-registered rule (< +2/30): the `CB_PREF` adapter lever is REVERTED (this commit); the library
+capability (opt-in `extract_preferences=True` + schema-driven aggregation, CB commit `7a3a777`)
+stays, shipped on its own merits. This is the third consecutive category-lever null at the local
+7B (temporal x2, preference x1), consistent with the standing conclusion that oracle category
+gaps are answerer/extraction-bound at this model scale, not retrieval-bound.
