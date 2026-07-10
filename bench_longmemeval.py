@@ -87,6 +87,28 @@ def session_text(session: list[dict], date: str) -> str:
 
 
 # ------------------------------------------------------------------------- backends ------
+# CB_PREF=1 (pre-registered lever, frozen before the preference-subset run): map the
+# LLM-extracted attribute forms of a preference into CB's "preference:<topic>" fact family
+# so the library's preference aggregation (opt-in, shipped 7a3a777) has facts to work on.
+# "favorite cuisine | Thai" -> preference:cuisine = Thai; "likes | hiking" -> preference:hiking
+# = like (polarity object). Anything else passes through untouched.
+_PREF_LIKE = {"likes", "loves", "enjoys", "prefers", "favors", "like", "love", "enjoy",
+              "prefer"}
+_PREF_DISLIKE = {"dislikes", "hates", "dislike", "hate"}
+
+
+def _map_preference(pred: str, obj: str) -> tuple[str, str]:
+    pl = pred.lower().strip()
+    if pl.startswith("favorite ") or pl.startswith("favourite "):
+        return "preference:" + pl.split(" ", 1)[1], obj
+    if pl in _PREF_LIKE or pl in _PREF_DISLIKE:
+        toks = [t for t in obj.lower().split() if t.isalpha()]
+        if not toks:
+            return pred, obj
+        return "preference:" + toks[-1], ("like" if pl in _PREF_LIKE else "dislike")
+    return pred, obj
+
+
 class CBBackend:
     """Curated Brain: shared-model session-batched extraction at write time + hybrid
     retrieval; the vector tier runs on the SAME nomic embedder as the rivals."""
@@ -129,6 +151,8 @@ class CBBackend:
                 subj, pred, obj = parts
                 if pred.lower() == "attribute" or obj.lower() == "value":
                     continue  # the model echoed the prompt's template line, not a fact
+                if os.environ.get("CB_PREF") == "1":
+                    pred, obj = _map_preference(pred, obj)
                 self.cb.write(f"[{date}] {subj}'s {pred} is {obj}.", session_id=date,
                               timestamp=ts + 1000,
                               metadata={"fact": {"subject": subj, "predicate": pred,
